@@ -1,5 +1,11 @@
 mod home;
 pub use home::Home;
 
-mod blog;
-pub use blog::Blog;
+mod moderate;
+pub use moderate::Moderate;
+
+mod users;
+pub use users::Users;
+
+mod setup;
+pub use setup::Setup;

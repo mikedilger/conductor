@@ -1,6 +1,12 @@
 #navbar {
   display: flex;
   flex-direction: row;
+  border-bottom: 1px dotted white;
+}
+
+#navbar a.title {
+    font-size: 1.3em;
+    margin-right: 30px;
 }
 
 #navbar a {
