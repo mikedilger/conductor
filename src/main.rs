@@ -24,6 +24,7 @@ const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
 
 fn main() {
+    dioxus_sdk::storage::set_dir!();
     dioxus::launch(App);
 }
 
