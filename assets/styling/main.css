@@ -5,30 +5,25 @@ body {
     margin: 20px;
 }
 
-#links {
-    width: 400px;
-    text-align: left;
-    font-size: x-large;
-    color: white;
-    display: flex;
-    flex-direction: column;
+a {
+    color: #7F00FF;
+    margin-left: 0.35em;
+    margin-right: 0.35em;
 }
 
-#links a {
-    color: white;
-    text-decoration: none;
-    margin-top: 20px;
-    margin: 10px 0px;
-    border: white 1px solid;
-    border-radius: 5px;
-    padding: 10px;
-}
-
-#links a:hover {
-    background-color: #1f1f1f;
+a:hover {
+    background-color: #3f3f3f;
     cursor: pointer;
+}
+
+a:visited {
+    color: #A000A0;
 }
 
 #header {
     max-width: 1200px;
+}
+
+div.paragraph {
+    margin-top: 1em;
 }
