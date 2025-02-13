@@ -482,9 +482,6 @@ version = "0.1.0"
 dependencies = [
  "dioxus",
  "dioxus-sdk",
- "serde",
- "serde_json",
- "web-sys",
 ]
 
 [[package]]

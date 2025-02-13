@@ -1,18 +1,10 @@
 use dioxus::prelude::*;
-use dioxus_sdk::storage::*;
-use serde::{Serialize, Deserialize};
-use web_sys::window;
 
 use components::Navbar;
 use views::{Home, Moderate, Users, Setup};
 
 mod components;
 mod views;
-
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
-struct AppState {
-    relay_url: String,
-}
 
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]
@@ -38,13 +30,11 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    // use_persistent_context_provider(cx);
-
     rsx! {
         // Global app resources
         document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
 
-        Router::<Route> { }
+        Router::<Route> {}
     }
 }
