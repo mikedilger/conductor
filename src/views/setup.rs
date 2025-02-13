@@ -1,14 +1,12 @@
 use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
+use crate::Globals;
 
 const SETUP_CSS: Asset = asset!("/assets/styling/setup.css");
 
 #[component]
 pub fn Setup() -> Element {
-    let mut relay_url = use_synced_storage::<LocalStorage, String>(
-        "relay_url".to_string(),
-        || "".to_string()
-    );
+    let mut globals = use_context::<Signal<Globals>>();
 
     rsx! {
         document::Link { rel: "stylesheet", href: SETUP_CSS}
@@ -18,8 +16,10 @@ pub fn Setup() -> Element {
             "Relay Url: ",
             input {
                 size: 100,
-                value: "{relay_url}",
-                oninput: move |event| relay_url.set(event.value())
+                value: "{globals().relay_url}",
+                oninput: move |event| {
+                    globals.write().relay_url = event.value();
+                },
             }
         }
     }

@@ -1,10 +1,17 @@
-use dioxus::prelude::*;
-
-use components::Navbar;
-use views::{Home, Moderate, Users, Setup};
-
 mod components;
 mod views;
+
+use dioxus::prelude::*;
+use dioxus_sdk::storage::*;
+use components::Navbar;
+use serde::{Serialize, Deserialize};
+use views::{Home, Moderate, Users, Setup};
+
+
+#[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct Globals {
+    pub relay_url: String,
+}
 
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]
@@ -30,6 +37,12 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+    let globals = use_synced_storage::<LocalStorage, Globals>(
+        "globals".to_string(),
+        || Default::default()
+    );
+    use_context_provider(|| globals);
+
     rsx! {
         // Global app resources
         document::Link { rel: "icon", href: FAVICON }
