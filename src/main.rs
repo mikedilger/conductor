@@ -1,5 +1,6 @@
 mod components;
 mod views;
+mod nip86;
 
 use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
