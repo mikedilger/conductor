@@ -2,7 +2,10 @@
 name = "conductor"
 version = "0.1.0"
 authors = ["Mike Dilger <mike@mikedilger.com>"]
+description = "A nostr relay manager"
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/mikedilger/conductor"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
