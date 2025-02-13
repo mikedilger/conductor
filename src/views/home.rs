@@ -25,5 +25,5 @@ pub fn Home() -> Element {
                 "github"
             }
         }
-}
+    }
 }

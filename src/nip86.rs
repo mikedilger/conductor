@@ -8,7 +8,7 @@ use nostr::types::time::Timestamp;
 use nostr::util::{hex, JsonUtil};
 use reqwest::Client;
 use secp256k1::hashes::{sha256, Hash};
-use serde_json::{json, Value};
+use serde_json::{json, Value, Map};
 
 async fn auth_header(uri: &Uri, payload: &str)
                          -> Result<String, Box<dyn std::error::Error>>
@@ -79,7 +79,7 @@ async fn post(uri: &Uri, body: String) -> Result<Value, Box<dyn std::error::Erro
     let response = client
         .post(format!("{}", uri))
         .header("Host", host)
-        .header("Accept", "application/nostr+json+rpc")
+        .header("Content-Type", "application/nostr+json+rpc")
         .header("Authorization", auth)
         .body(body)
         .send().await?;
@@ -107,4 +107,41 @@ pub async fn run_command_on_relay(
     let uri = url.parse::<Uri>()?;
     let value = post(&uri, cmdstr).await?;
     Ok(value)
+}
+
+pub async fn stats(
+    url: &str,
+    method: &str,
+    params: Value
+) -> Map<String, Value> {
+    let mut rval = Map::<String, Value>::new();
+    let _ = rval.insert("error".to_string(), Value::Null);
+    let _ = rval.insert("result".to_string(), Value::Null);
+
+    let value = match run_command_on_relay(url, method, params).await {
+        Ok(v) => v,
+        Err(e) => {
+            let _ = rval.insert("client_error".to_string(), Value::String(e.to_string()));
+            return rval;
+        }
+    };
+
+    let _ = match value {
+        Value::Null => { },
+        Value::Bool(_) => {
+            rval.insert("result".to_owned(), value);
+        },
+        Value::Number(_) => {
+            rval.insert("result".to_owned(), value);
+        },
+        Value::String(_) => {
+            rval.insert("result".to_owned(), value);
+        },
+        Value::Array(_) => {
+            rval.insert("result".to_owned(), value);
+        },
+        Value::Object(m) => rval = m,
+    };
+
+    rval
 }
