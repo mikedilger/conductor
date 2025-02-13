@@ -1,10 +1,19 @@
-use crate::Route;
+use crate::{Globals, Route};
 use dioxus::prelude::*;
+use nostr::nips::nip07::BrowserSigner;
+use nostr::types::url::RelayUrl;
 
 const NAVBAR_CSS: Asset = asset!("/assets/styling/navbar.css");
 
 #[component]
 pub fn Navbar() -> Element {
+    let mut globals = use_context::<Signal<Globals>>();
+
+    let browser_signer = BrowserSigner::new();
+    let found_signer = browser_signer.is_ok();
+    let url_is_ok = RelayUrl::parse(globals().relay_url.as_str()).is_ok();
+    let setup = found_signer & url_is_ok;
+
     rsx! {
         document::Link { rel: "stylesheet", href: NAVBAR_CSS }
 
@@ -19,13 +28,23 @@ pub fn Navbar() -> Element {
                 to: Route::Setup {},
                 "Setup"
             }
-            Link {
-                to: Route::Moderate {},
-                "Moderate"
-            }
-            Link {
-                to: Route::Users {},
-                "Users"
+            if setup {
+                Link {
+                    to: Route::Info {},
+                    "Info"
+                }
+                Link {
+                    to: Route::Queue {},
+                    "Queue"
+                }
+                Link {
+                    to: Route::Reports {},
+                    "Reports"
+                }
+                Link {
+                    to: Route::Users {},
+                    "Users"
+                }
             }
         }
 

@@ -17,40 +17,6 @@ pub fn Home() -> Element {
             " relay manager.",
         }
 
-        blockquote {
-
-            div {
-                class: "paragraph",
-                "Step 1: Navigate to ",
-                a {
-                    href: "/setup",
-                    "setup"
-                }
-                " to pick a relay and configure your identity"
-            }
-
-            div {
-                class: "paragraph",
-                "Step 2: Navigate to ",
-                a {
-                    href: "/moderate",
-                    "moderate"
-                }
-                " moderate to approve or reject events in the moderation queue"
-            }
-
-            div {
-                class: "paragraph",
-                "Step 3: Navigate to ",
-                a {
-                    href: "/users",
-                    "users"
-                }
-                " users to change users and moderators"
-            }
-
-        }
-
         div {
             class: "paragraph",
             "conduuctor is available on ",

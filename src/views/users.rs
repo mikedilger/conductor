@@ -9,7 +9,7 @@ pub fn Users() -> Element {
 
         div {
             id: "users",
-            "users will go here"
+            "User management is not yet supported."
         }
     }
 }

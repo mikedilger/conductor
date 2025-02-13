@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
 use components::Navbar;
 use serde::{Serialize, Deserialize};
-use views::{Home, Moderate, Users, Setup};
+use views::{Home, Setup, Info, Queue, Reports, Users};
 
 
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
@@ -22,8 +22,12 @@ enum Route {
     Home {},
     #[route("/setup")]
     Setup,
-    #[route("/moderate")]
-    Moderate,
+    #[route("/info")]
+    Info,
+    #[route("/queue")]
+    Queue,
+    #[route("/reports")]
+    Reports,
     #[route("/users")]
     Users,
 }

@@ -1,7 +1,7 @@
+use crate::Globals;
 use dioxus::prelude::*;
 use nostr::nips::nip07::BrowserSigner;
 use nostr::types::url::RelayUrl;
-use crate::Globals;
 
 const SETUP_CSS: Asset = asset!("/assets/styling/setup.css");
 
