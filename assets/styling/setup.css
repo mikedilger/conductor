@@ -2,3 +2,19 @@
 #setup {
     margin-top: 30px;
 }
+
+.success {
+    color: white;
+    background-color: #4BB543;
+    margin-left: 0.35em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+.failure {
+    color: black;
+    background-color: #F8C90D;
+    margin-left: 0.35em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}

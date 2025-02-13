@@ -16,16 +16,16 @@ pub fn Navbar() -> Element {
                 "Conductor"
             }
             Link {
+                to: Route::Setup {},
+                "Setup"
+            }
+            Link {
                 to: Route::Moderate {},
                 "Moderate"
             }
             Link {
                 to: Route::Users {},
                 "Users"
-            }
-            Link {
-                to: Route::Setup {},
-                "Setup"
             }
         }
 

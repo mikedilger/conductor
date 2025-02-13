@@ -19,12 +19,12 @@ enum Route {
     #[layout(Navbar)]
     #[route("/")]
     Home {},
+    #[route("/setup")]
+    Setup,
     #[route("/moderate")]
     Moderate,
     #[route("/users")]
     Users,
-    #[route("/setup")]
-    Setup,
 }
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
