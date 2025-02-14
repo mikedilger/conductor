@@ -136,3 +136,26 @@ pub async fn stats(url: &str) -> Result<Map<String, Value>, Box<dyn std::error::
         }
     }
 }
+
+pub async fn mod_queue(
+    url: &str,
+) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "listeventsneedingmoderation", json!([])).await?;
+
+    let err = |s| -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+        Err(Box::new(std::io::Error::other(s)))
+    };
+
+    if let Some(err) = response.error {
+        Err(Box::new(std::io::Error::other(err)))
+    } else {
+        match response.result {
+            Value::Null => err("Result was not an array, it was null"),
+            Value::Bool(b) => err("Result was not an array, it was a bool: {b}"),
+            Value::Number(n) => err("Result was not an array, it was a number: {n}"),
+            Value::String(s) => err("Result was not an array, it was a string: {s}"),
+            Value::Array(a) => Ok(a),
+            Value::Object(m) => err("Result was not an array, it was as array: {a}"),
+        }
+    }
+}
