@@ -7,7 +7,7 @@ const NAVBAR_CSS: Asset = asset!("/assets/styling/navbar.css");
 
 #[component]
 pub fn Navbar() -> Element {
-    let mut globals = use_context::<Signal<Globals>>();
+    let globals = use_context::<Signal<Globals>>();
 
     let browser_signer = BrowserSigner::new();
     let found_signer = browser_signer.is_ok();

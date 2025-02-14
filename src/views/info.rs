@@ -7,7 +7,7 @@ const INFO_CSS: Asset = asset!("/assets/styling/info.css");
 
 #[component]
 pub fn Info() -> Element {
-    let mut globals = use_context::<Signal<Globals>>();
+    let globals = use_context::<Signal<Globals>>();
 
     let stats = use_resource(move || async move {
         crate::nip86::stats(
