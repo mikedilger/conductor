@@ -20,7 +20,6 @@ pub fn Json(property: Value) -> Element {
 
 #[component]
 pub fn JsonInner(property: Value, depth: usize) -> Element {
-
     rsx! {
         match property {
             Value::String(s) => rsx!(span { "{s}" }),

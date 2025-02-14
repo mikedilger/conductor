@@ -1,6 +1,6 @@
 use base64::Engine;
 use http::uri::{Scheme, Uri};
-use nostr::event::{Event, Kind, Tags, Tag, TagStandard, UnsignedEvent};
+use nostr::event::{Event, Kind, Tag, TagStandard, Tags, UnsignedEvent};
 use nostr::nips::nip07::BrowserSigner;
 use nostr::nips::nip98::HttpMethod;
 use nostr::signer::NostrSigner;
@@ -8,11 +8,9 @@ use nostr::types::time::Timestamp;
 use nostr::util::{hex, JsonUtil};
 use reqwest::Client;
 use secp256k1::hashes::{sha256, Hash};
-use serde_json::{json, Value, Map};
+use serde_json::{json, Map, Value};
 
-async fn auth_header(uri: &Uri, payload: &str)
-                         -> Result<String, Box<dyn std::error::Error>>
-{
+async fn auth_header(uri: &Uri, payload: &str) -> Result<String, Box<dyn std::error::Error>> {
     let payload_hash = sha256::Hash::hash(payload.as_bytes());
     let payload_hash_bytes = <sha256::Hash as AsRef<[u8]>>::as_ref(&payload_hash);
     let payload_hash_string = hex::encode(payload_hash_bytes);
@@ -21,9 +19,7 @@ async fn auth_header(uri: &Uri, payload: &str)
     Ok(format!("Nostr {}", base64))
 }
 
-async fn auth_event(uri: &Uri, payload_hash: &str)
-                  -> Result<Event, Box<dyn std::error::Error>>
-{
+async fn auth_event(uri: &Uri, payload_hash: &str) -> Result<Event, Box<dyn std::error::Error>> {
     let signer = BrowserSigner::new()?;
 
     let tags = Tags::new(vec![
@@ -74,20 +70,23 @@ async fn post(uri: &Uri, body: String) -> Result<Value, Box<dyn std::error::Erro
 
     let auth = auth_header(&uri, &body).await?;
 
-    let client = Client::builder()
-        .build()?;
+    let client = Client::builder().build()?;
     let response = client
         .post(format!("{}", uri))
         .header("Host", host)
         .header("Content-Type", "application/nostr+json+rpc")
         .header("Authorization", auth)
         .body(body)
-        .send().await?;
+        .send()
+        .await?;
 
     let status = response.status().as_u16();
     let response_text = response.text().await?;
     if status != 200 {
-        return Err(Box::new(std::io::Error::other(format!("Server responded with {}", status))));
+        return Err(Box::new(std::io::Error::other(format!(
+            "Server responded with {}",
+            status
+        ))));
     }
 
     let value: Value = serde_json::from_str(&response_text)?;
@@ -97,7 +96,7 @@ async fn post(uri: &Uri, body: String) -> Result<Value, Box<dyn std::error::Erro
 pub async fn run_command_on_relay(
     url: &str,
     method: &str,
-    params: Value
+    params: Value,
 ) -> Result<Value, Box<dyn std::error::Error>> {
     let cmd = json!({
         "method": method,
@@ -109,11 +108,7 @@ pub async fn run_command_on_relay(
     Ok(value)
 }
 
-pub async fn stats(
-    url: &str,
-    method: &str,
-    params: Value
-) -> Map<String, Value> {
+pub async fn stats(url: &str, method: &str, params: Value) -> Map<String, Value> {
     let mut rval = Map::<String, Value>::new();
     let _ = rval.insert("error".to_string(), Value::Null);
     let _ = rval.insert("result".to_string(), Value::Null);
@@ -127,19 +122,19 @@ pub async fn stats(
     };
 
     let _ = match value {
-        Value::Null => { },
+        Value::Null => {}
         Value::Bool(_) => {
             rval.insert("result".to_owned(), value);
-        },
+        }
         Value::Number(_) => {
             rval.insert("result".to_owned(), value);
-        },
+        }
         Value::String(_) => {
             rval.insert("result".to_owned(), value);
-        },
+        }
         Value::Array(_) => {
             rval.insert("result".to_owned(), value);
-        },
+        }
         Value::Object(m) => rval = m,
     };
 

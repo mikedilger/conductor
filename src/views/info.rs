@@ -1,5 +1,5 @@
-use crate::Globals;
 use crate::components::Json;
+use crate::Globals;
 use dioxus::prelude::*;
 use serde_json::{json, Value};
 
@@ -10,11 +10,7 @@ pub fn Info() -> Element {
     let globals = use_context::<Signal<Globals>>();
 
     let stats = use_resource(move || async move {
-        crate::nip86::stats(
-            globals().relay_url.as_str(),
-            "stats",
-            json!([]),
-        ).await
+        crate::nip86::stats(globals().relay_url.as_str(), "stats", json!([])).await
     });
 
     rsx! {

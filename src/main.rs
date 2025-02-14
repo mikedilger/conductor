@@ -1,13 +1,12 @@
 mod components;
-mod views;
 mod nip86;
+mod views;
 
+use components::Navbar;
 use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
-use components::Navbar;
-use serde::{Serialize, Deserialize};
-use views::{Home, Setup, Info, Queue, Reports, Users};
-
+use serde::{Deserialize, Serialize};
+use views::{Home, Info, Queue, Reports, Setup, Users};
 
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Globals {
@@ -42,10 +41,8 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    let globals = use_synced_storage::<LocalStorage, Globals>(
-        "globals".to_string(),
-        || Default::default()
-    );
+    let globals =
+        use_synced_storage::<LocalStorage, Globals>("globals".to_string(), || Default::default());
     use_context_provider(|| globals);
 
     rsx! {
