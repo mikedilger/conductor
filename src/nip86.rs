@@ -8,6 +8,7 @@ use nostr::types::time::Timestamp;
 use nostr::util::{hex, JsonUtil};
 use reqwest::Client;
 use secp256k1::hashes::{sha256, Hash};
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
 
 async fn auth_header(uri: &Uri, payload: &str) -> Result<String, Box<dyn std::error::Error>> {
@@ -42,7 +43,14 @@ async fn auth_event(uri: &Uri, payload_hash: &str) -> Result<Event, Box<dyn std:
     Ok(event)
 }
 
-async fn post(uri: &Uri, body: String) -> Result<Value, Box<dyn std::error::Error>> {
+#[derive(Deserialize)]
+pub struct Nip86Response {
+    #[serde(default)]
+    pub error: Option<String>,
+    pub result: Value,
+}
+
+async fn post(uri: &Uri, body: String) -> Result<Nip86Response, Box<dyn std::error::Error>> {
     let host = {
         let authority = uri.authority().expect("Has no hostname").as_str();
         authority
@@ -71,7 +79,7 @@ async fn post(uri: &Uri, body: String) -> Result<Value, Box<dyn std::error::Erro
     let auth = auth_header(&uri, &body).await?;
 
     let client = Client::builder().build()?;
-    let response = client
+    let http_response = client
         .post(format!("{}", uri))
         .header("Host", host)
         .header("Content-Type", "application/nostr+json+rpc")
@@ -80,8 +88,8 @@ async fn post(uri: &Uri, body: String) -> Result<Value, Box<dyn std::error::Erro
         .send()
         .await?;
 
-    let status = response.status().as_u16();
-    let response_text = response.text().await?;
+    let status = http_response.status().as_u16();
+    let http_response_text = http_response.text().await?;
     if status != 200 {
         return Err(Box::new(std::io::Error::other(format!(
             "Server responded with {}",
@@ -89,54 +97,42 @@ async fn post(uri: &Uri, body: String) -> Result<Value, Box<dyn std::error::Erro
         ))));
     }
 
-    let value: Value = serde_json::from_str(&response_text)?;
-    Ok(value)
+    let nip86_response: Nip86Response = serde_json::from_str(&http_response_text)?;
+    Ok(nip86_response)
 }
 
 pub async fn run_command_on_relay(
     url: &str,
     method: &str,
     params: Value,
-) -> Result<Value, Box<dyn std::error::Error>> {
+) -> Result<Nip86Response, Box<dyn std::error::Error>> {
     let cmd = json!({
         "method": method,
         "params": params
     });
     let cmdstr = serde_json::to_string(&cmd)?;
     let uri = url.parse::<Uri>()?;
-    let value = post(&uri, cmdstr).await?;
-    Ok(value)
+    let nip86response = post(&uri, cmdstr).await?;
+    Ok(nip86response)
 }
 
-pub async fn stats(url: &str, method: &str, params: Value) -> Map<String, Value> {
-    let mut rval = Map::<String, Value>::new();
-    let _ = rval.insert("error".to_string(), Value::Null);
-    let _ = rval.insert("result".to_string(), Value::Null);
+pub async fn stats(url: &str) -> Result<Map<String, Value>, Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "stats", json!([])).await?;
 
-    let value = match run_command_on_relay(url, method, params).await {
-        Ok(v) => v,
-        Err(e) => {
-            let _ = rval.insert("client_error".to_string(), Value::String(e.to_string()));
-            return rval;
-        }
+    let err = |s| -> Result<Map<String, Value>, Box<dyn std::error::Error>> {
+        Err(Box::new(std::io::Error::other(s)))
     };
 
-    let _ = match value {
-        Value::Null => {}
-        Value::Bool(_) => {
-            rval.insert("result".to_owned(), value);
+    if let Some(err) = response.error {
+        Err(Box::new(std::io::Error::other(err)))
+    } else {
+        match response.result {
+            Value::Null => err("Result was not an object, it was null"),
+            Value::Bool(b) => err("Result was not an object, it was a bool: {b}"),
+            Value::Number(n) => err("Result was not an object, it was a number: {n}"),
+            Value::String(s) => err("Result was not an object, it was a string: {s}"),
+            Value::Array(a) => err("Result was not an object, it was as array: {a}"),
+            Value::Object(m) => Ok(m),
         }
-        Value::Number(_) => {
-            rval.insert("result".to_owned(), value);
-        }
-        Value::String(_) => {
-            rval.insert("result".to_owned(), value);
-        }
-        Value::Array(_) => {
-            rval.insert("result".to_owned(), value);
-        }
-        Value::Object(m) => rval = m,
-    };
-
-    rval
+    }
 }
