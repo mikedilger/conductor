@@ -1,12 +1,12 @@
-use crate::Globals;
+use crate::Config;
 use dioxus::prelude::*;
 
 const USERS_CSS: Asset = asset!("/assets/styling/users.css");
 
 #[component]
 pub fn Users() -> Element {
-    let globals = use_context::<Signal<Globals>>();
-    let relay_url = globals().relay_url.as_str().to_owned();
+    let config = use_context::<Signal<Config>>();
+    let relay_url = config().relay_url.as_str().to_owned();
 
     rsx! {
 

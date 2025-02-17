@@ -1,5 +1,5 @@
 use crate::components::Json;
-use crate::Globals;
+use crate::Config;
 use dioxus::prelude::*;
 use serde_json::Value;
 
@@ -7,12 +7,12 @@ const INFO_CSS: Asset = asset!("/assets/styling/info.css");
 
 #[component]
 pub fn Info() -> Element {
-    let globals = use_context::<Signal<Globals>>();
-    let relay_url = globals().relay_url.as_str().to_owned();
+    let config = use_context::<Signal<Config>>();
+    let relay_url = config().relay_url.as_str().to_owned();
 
     let stats =
         use_resource(
-            move || async move { crate::nip86::stats(globals().relay_url.as_str()).await },
+            move || async move { crate::nip86::stats(config().relay_url.as_str()).await },
         );
 
     rsx! {

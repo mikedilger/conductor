@@ -1,4 +1,4 @@
-use crate::Globals;
+use crate::Config;
 use crate::components::Json;
 use dioxus::prelude::*;
 
@@ -6,12 +6,12 @@ const QUEUE_CSS: Asset = asset!("/assets/styling/queue.css");
 
 #[component]
 pub fn Queue() -> Element {
-    let globals = use_context::<Signal<Globals>>();
-    let relay_url = globals().relay_url.as_str().to_owned();
+    let config = use_context::<Signal<Config>>();
+    let relay_url = config().relay_url.as_str().to_owned();
 
     let mod_queue = use_resource(move || async move {
         crate::nip86::mod_queue(
-            globals().relay_url.as_str(),
+            config().relay_url.as_str(),
         ).await
     });
 

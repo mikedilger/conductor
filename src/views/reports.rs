@@ -1,12 +1,12 @@
-use crate::Globals;
+use crate::Config;
 use dioxus::prelude::*;
 
 const REPORTS_CSS: Asset = asset!("/assets/styling/reports.css");
 
 #[component]
 pub fn Reports() -> Element {
-    let globals = use_context::<Signal<Globals>>();
-    let relay_url = globals().relay_url.as_str().to_owned();
+    let config = use_context::<Signal<Config>>();
+    let relay_url = config().relay_url.as_str().to_owned();
 
     rsx! {
         document::Link { rel: "stylesheet", href: REPORTS_CSS}

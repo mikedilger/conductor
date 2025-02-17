@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use views::{Home, Info, Queue, Reports, Setup, Users};
 
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
-pub struct Globals {
+pub struct Config {
     pub relay_url: String,
 }
 
@@ -41,9 +41,9 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    let globals =
-        use_synced_storage::<LocalStorage, Globals>("globals".to_string(), || Default::default());
-    use_context_provider(|| globals);
+    let config =
+        use_synced_storage::<LocalStorage, Config>("config".to_string(), || Default::default());
+    use_context_provider(|| config);
 
     rsx! {
         // Global app resources
