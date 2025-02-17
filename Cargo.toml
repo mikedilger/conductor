@@ -15,6 +15,7 @@ dioxus = { version = "0.6", features = ["router"] }
 dioxus-sdk = { version = "0.6", features = ["storage"] }
 http = "1.2"
 nostr = { version = "0.39", features = ["std", "nip07", "nip98"] }
+nostr-sdk = { version = "0.39", features = ["nip07", "nip98"] }
 reqwest = { version = "0.12", features = [ "rustls-tls-native-roots" ] }
 secp256k1 = { version = "0.28", features = [ "hashes", "global-context", "rand-std" ] }
 serde = { version = "1.0.217", features = ["derive"] }
