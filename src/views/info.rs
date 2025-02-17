@@ -8,6 +8,7 @@ const INFO_CSS: Asset = asset!("/assets/styling/info.css");
 #[component]
 pub fn Info() -> Element {
     let globals = use_context::<Signal<Globals>>();
+    let relay_url = globals().relay_url.as_str().to_owned();
 
     let stats =
         use_resource(
@@ -20,6 +21,11 @@ pub fn Info() -> Element {
         div {
             id: "info",
             h1 { "Info" },
+
+            div {
+                class: "relay",
+                "{relay_url}"
+            }
 
             div {
                 id: "stats",

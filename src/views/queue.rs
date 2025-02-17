@@ -7,6 +7,7 @@ const QUEUE_CSS: Asset = asset!("/assets/styling/queue.css");
 #[component]
 pub fn Queue() -> Element {
     let globals = use_context::<Signal<Globals>>();
+    let relay_url = globals().relay_url.as_str().to_owned();
 
     let mod_queue = use_resource(move || async move {
         crate::nip86::mod_queue(
@@ -20,6 +21,11 @@ pub fn Queue() -> Element {
         div {
             id: "queue",
             h1 { "Moderation Queue" }
+
+            div {
+                class: "relay",
+                "{relay_url}"
+            }
 
             match &*mod_queue.read_unchecked() {
                 Some(Ok(v)) => rsx! {

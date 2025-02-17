@@ -31,3 +31,11 @@ div.paragraph {
 input {
     background-color: #B8B8B8;
 }
+
+div.relay {
+    color: #ab8aff;
+    font-style: italic;
+    font-size: 1.2em;
+    margin-left: 2em;
+    margin-bottom: 1em;
+}
