@@ -8,7 +8,7 @@ use nostr::types::time::Timestamp;
 use nostr::util::{hex, JsonUtil};
 use reqwest::Client;
 use secp256k1::hashes::{sha256, Hash};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::{json, Map, Value};
 
 async fn auth_header(uri: &Uri, payload: &str) -> Result<String, Box<dyn std::error::Error>> {
@@ -126,13 +126,10 @@ pub async fn stats(url: &str) -> Result<Map<String, Value>, Box<dyn std::error::
     if let Some(err) = response.error {
         Err(Box::new(std::io::Error::other(err)))
     } else {
-        match response.result {
-            Value::Null => err("Result was not an object, it was null"),
-            Value::Bool(b) => err("Result was not an object, it was a bool: {b}"),
-            Value::Number(n) => err("Result was not an object, it was a number: {n}"),
-            Value::String(s) => err("Result was not an object, it was a string: {s}"),
-            Value::Array(a) => err("Result was not an object, it was as array: {a}"),
-            Value::Object(m) => Ok(m),
+        if let Value::Object(m) = response.result {
+            Ok(m)
+        } else {
+            err("Result was not an object.")
         }
     }
 }
@@ -149,13 +146,10 @@ pub async fn mod_queue(
     if let Some(err) = response.error {
         Err(Box::new(std::io::Error::other(err)))
     } else {
-        match response.result {
-            Value::Null => err("Result was not an array, it was null"),
-            Value::Bool(b) => err("Result was not an array, it was a bool: {b}"),
-            Value::Number(n) => err("Result was not an array, it was a number: {n}"),
-            Value::String(s) => err("Result was not an array, it was a string: {s}"),
-            Value::Array(a) => Ok(a),
-            Value::Object(m) => err("Result was not an array, it was as array: {a}"),
+        if let Value::Array(a) = response.result {
+            Ok(a)
+        } else {
+            err("Result was not an array")
         }
     }
 }

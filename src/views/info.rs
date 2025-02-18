@@ -1,7 +1,7 @@
 use crate::components::Json;
 use crate::Globals;
 use dioxus::prelude::*;
-use serde_json::{json, Value};
+use serde_json::Value;
 
 const INFO_CSS: Asset = asset!("/assets/styling/info.css");
 

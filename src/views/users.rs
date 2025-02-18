@@ -5,7 +5,7 @@ const USERS_CSS: Asset = asset!("/assets/styling/users.css");
 
 #[component]
 pub fn Users() -> Element {
-    let mut globals = use_context::<Signal<Globals>>();
+    let globals = use_context::<Signal<Globals>>();
     let relay_url = globals().relay_url.as_str().to_owned();
 
     rsx! {
