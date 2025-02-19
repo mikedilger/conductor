@@ -1,15 +1,19 @@
 use base64::Engine;
 use http::uri::{Scheme, Uri};
+use nostr::event::id::EventId;
 use nostr::event::{Event, Kind, Tag, TagStandard, Tags, UnsignedEvent};
+use nostr::filter::Filter;
 use nostr::nips::nip07::BrowserSigner;
 use nostr::nips::nip98::HttpMethod;
 use nostr::signer::NostrSigner;
 use nostr::types::time::Timestamp;
 use nostr::util::{hex, JsonUtil};
-use reqwest::Client;
+use nostr_sdk::Client as NostrClient;
+use reqwest::Client as HttpClient;
 use secp256k1::hashes::{sha256, Hash};
 use serde::Deserialize;
 use serde_json::{json, Map, Value};
+use std::time::Duration;
 
 async fn auth_header(uri: &Uri, payload: &str) -> Result<String, Box<dyn std::error::Error>> {
     let payload_hash = sha256::Hash::hash(payload.as_bytes());
@@ -78,7 +82,7 @@ async fn post(uri: &Uri, body: String) -> Result<Nip86Response, Box<dyn std::err
 
     let auth = auth_header(&uri, &body).await?;
 
-    let client = Client::builder().build()?;
+    let client = HttpClient::builder().build()?;
     let http_response = client
         .post(format!("{}", uri))
         .header("Host", host)
@@ -134,22 +138,46 @@ pub async fn stats(url: &str) -> Result<Map<String, Value>, Box<dyn std::error::
     }
 }
 
-pub async fn mod_queue(
-    url: &str,
-) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+pub async fn mod_queue(url: &str) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
     let response = run_command_on_relay(url, "listeventsneedingmoderation", json!([])).await?;
 
-    let err = |s| -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+    let err = |s| -> Result<Vec<Event>, Box<dyn std::error::Error>> {
         Err(Box::new(std::io::Error::other(s)))
     };
 
     if let Some(err) = response.error {
-        Err(Box::new(std::io::Error::other(err)))
-    } else {
-        if let Value::Array(a) = response.result {
-            Ok(a)
-        } else {
-            err("Result was not an array")
+        return Err(Box::new(std::io::Error::other(err)));
+    }
+
+    let Value::Array(arr) = response.result else {
+        return err("Result was not an array");
+    };
+
+    let mut filter: Filter = Default::default();
+    for elem in arr.iter() {
+        if let Some(map) = elem.as_object() {
+            if let Some(val) = map.get("id") {
+                if let Some(idstr) = val.as_str() {
+                    if let Ok(id) = EventId::parse(idstr) {
+                        filter = filter.id(id);
+                    }
+                }
+            }
         }
     }
+
+    if filter.is_empty() {
+        return Ok(vec![]);
+    }
+
+    let client = NostrClient::default();
+    client.set_signer(BrowserSigner::new()?).await;
+    client.add_relay(url).await?;
+    client.connect().await;
+    let events = client
+        .fetch_events(filter, Duration::from_secs(5))
+        .await?
+        .to_vec();
+
+    Ok(events)
 }

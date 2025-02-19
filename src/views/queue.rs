@@ -1,5 +1,4 @@
 use crate::Config;
-use crate::components::Json;
 use dioxus::prelude::*;
 
 const QUEUE_CSS: Asset = asset!("/assets/styling/queue.css");
@@ -29,9 +28,8 @@ pub fn Queue() -> Element {
             match &*mod_queue.read_unchecked() {
                 Some(Ok(v)) => rsx! {
                     for e in v.iter() {
-                        Json {
-                            property: e.clone(),
-                        }
+                        "EVENT: ",
+                        "{e.content}"
                     }
                 },
                 Some(Err(e)) => rsx! {
