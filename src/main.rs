@@ -5,6 +5,7 @@ mod views;
 use components::Navbar;
 use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
+use dioxus::logger::tracing::info;
 use serde::{Deserialize, Serialize};
 use views::{Home, Info, Queue, Reports, Setup, Users};
 
@@ -44,6 +45,8 @@ fn App() -> Element {
     let config =
         use_synced_storage::<LocalStorage, Config>("config".to_string(), || Default::default());
     use_context_provider(|| config);
+
+    info!("App started");
 
     rsx! {
         // Global app resources
