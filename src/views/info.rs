@@ -11,9 +11,7 @@ pub fn Info() -> Element {
     let relay_url = config().relay_url.as_str().to_owned();
 
     let stats =
-        use_resource(
-            move || async move { crate::nip86::stats(config().relay_url.as_str()).await },
-        );
+        use_resource(move || async move { crate::nip86::stats(config().relay_url.as_str()).await });
 
     rsx! {
         document::Link { rel: "stylesheet", href: INFO_CSS}

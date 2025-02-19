@@ -9,11 +9,10 @@ pub fn Queue() -> Element {
     let config = use_context::<Signal<Config>>();
     let relay_url = config().relay_url.as_str().to_owned();
 
-    let mod_queue = use_resource(move || async move {
-        crate::nip86::mod_queue(
-            config().relay_url.as_str(),
-        ).await
-    });
+    let mod_queue =
+        use_resource(
+            move || async move { crate::nip86::mod_queue(config().relay_url.as_str()).await },
+        );
 
     rsx! {
         document::Link { rel: "stylesheet", href: QUEUE_CSS}

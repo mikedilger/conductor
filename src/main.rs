@@ -3,9 +3,9 @@ mod nip86;
 mod views;
 
 use components::Navbar;
+use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
-use dioxus::logger::tracing::info;
 use serde::{Deserialize, Serialize};
 use views::{Home, Info, Queue, Reports, Setup, Users};
 
