@@ -1,4 +1,5 @@
 use crate::Config;
+use crate::components::RenderedEvent;
 use dioxus::prelude::*;
 
 const QUEUE_CSS: Asset = asset!("/assets/styling/queue.css");
@@ -28,8 +29,9 @@ pub fn Queue() -> Element {
             match &*mod_queue.read_unchecked() {
                 Some(Ok(v)) => rsx! {
                     for e in v.iter() {
-                        "EVENT: ",
-                        "{e.content}"
+                        RenderedEvent {
+                            e: e.clone()
+                        }
                     }
                 },
                 Some(Err(e)) => rsx! {
