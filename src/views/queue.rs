@@ -1,6 +1,7 @@
+use crate::components::{Button, ButtonProps, RenderedEvent};
 use crate::Config;
-use crate::components::RenderedEvent;
 use dioxus::prelude::*;
+use dioxus::logger::tracing::info;
 
 const QUEUE_CSS: Asset = asset!("/assets/styling/queue.css");
 
@@ -32,6 +33,38 @@ pub fn Queue() -> Element {
                         RenderedEvent {
                             e: e.clone(),
                             relay_url: relay_url.clone(),
+                        }
+                        Button {
+                            text: "Approve",
+                            onclick: move |event: Event<MouseData>| {
+                                event.stop_propagation(); // just the button, no deeper
+                                info!("Clicked Approve: {event:?}")
+                            },
+                            class: "default",
+                        }
+                        Button {
+                            text: "Approve User",
+                            onclick: move |event: Event<MouseData>| {
+                                event.stop_propagation(); // just the button, no deeper
+                                info!("Clicked Approve User: {event:?}")
+                            },
+                            class: "default",
+                        }
+                        Button {
+                            text: "DELETE",
+                            onclick: move |event: Event<MouseData>| {
+                                event.stop_propagation(); // just the button, no deeper
+                                info!("Clicked DELETE: {event:?}")
+                            },
+                            class: "danger",
+                        }
+                        Button {
+                            text: "DELETE and BAN USER",
+                            onclick: move |event: Event<MouseData>| {
+                                event.stop_propagation(); // just the button, no deeper
+                                info!("Clicked DELETE and BAN USER: {event:?}")
+                            },
+                            class: "danger",
                         }
                     }
                 },
