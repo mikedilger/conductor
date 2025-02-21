@@ -30,7 +30,8 @@ pub fn Queue() -> Element {
                 Some(Ok(v)) => rsx! {
                     for e in v.iter() {
                         RenderedEvent {
-                            e: e.clone()
+                            e: e.clone(),
+                            relay_url: relay_url.clone(),
                         }
                     }
                 },

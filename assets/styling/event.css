@@ -1,0 +1,13 @@
+
+.event {
+    border: 1px solid grey;
+    overflow-wrap: anywhere;
+}
+
+.event span.content {
+    color: yellow;
+}
+
+.event .indent {
+    margin-left: 2em;
+}
