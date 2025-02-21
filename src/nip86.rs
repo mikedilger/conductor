@@ -1,8 +1,10 @@
 use base64::Engine;
+use dioxus::logger::tracing::info;
 use http::uri::{Scheme, Uri};
 use nostr::event::id::EventId;
 use nostr::event::{Event, Kind, Tag, TagStandard, Tags, UnsignedEvent};
 use nostr::filter::Filter;
+use nostr::key::public_key::PublicKey;
 use nostr::nips::nip07::BrowserSigner;
 use nostr::nips::nip98::HttpMethod;
 use nostr::signer::NostrSigner;
@@ -47,7 +49,7 @@ async fn auth_event(uri: &Uri, payload_hash: &str) -> Result<Event, Box<dyn std:
     Ok(event)
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Nip86Response {
     #[serde(default)]
     pub error: Option<String>,
@@ -138,7 +140,10 @@ pub async fn stats(url: &str) -> Result<Map<String, Value>, Box<dyn std::error::
     }
 }
 
-pub async fn mod_queue(url: &str) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
+pub async fn mod_queue(
+    url: &str,
+    _reload_trick: usize,
+) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
     let response = run_command_on_relay(url, "listeventsneedingmoderation", json!([])).await?;
 
     let err = |s| -> Result<Vec<Event>, Box<dyn std::error::Error>> {
@@ -180,4 +185,33 @@ pub async fn mod_queue(url: &str) -> Result<Vec<Event>, Box<dyn std::error::Erro
         .to_vec();
 
     Ok(events)
+}
+
+pub async fn allow_event(url: &str, id: EventId) -> Result<(), Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "allowevent", json!([id, "unspecified",])).await?;
+    info!("{response:?}");
+
+    Ok(())
+}
+
+pub async fn ban_event(url: &str, id: EventId) -> Result<(), Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "banevent", json!([id, "unspecified",])).await?;
+    info!("{response:?}");
+
+    Ok(())
+}
+
+pub async fn allow_pubkey(url: &str, pubkey: PublicKey) -> Result<(), Box<dyn std::error::Error>> {
+    let response =
+        run_command_on_relay(url, "allowpubkey", json!([pubkey, "unspecified",])).await?;
+    info!("{response:?}");
+
+    Ok(())
+}
+
+pub async fn ban_pubkey(url: &str, pubkey: PublicKey) -> Result<(), Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "banpubkey", json!([pubkey, "unspecified",])).await?;
+    info!("{response:?}");
+
+    Ok(())
 }

@@ -1,7 +1,7 @@
 use crate::components::{Button, ButtonProps, RenderedEvent};
 use crate::Config;
-use dioxus::prelude::*;
 use dioxus::logger::tracing::info;
+use dioxus::prelude::*;
 
 const QUEUE_CSS: Asset = asset!("/assets/styling/queue.css");
 
@@ -10,10 +10,11 @@ pub fn Queue() -> Element {
     let config = use_context::<Signal<Config>>();
     let relay_url = config().relay_url.as_str().to_owned();
 
-    let mod_queue =
-        use_resource(
-            move || async move { crate::nip86::mod_queue(config().relay_url.as_str()).await },
-        );
+    let mut reload_trick = use_signal(|| 0);
+
+    let mod_queue = use_resource(move || async move {
+        crate::nip86::mod_queue(config().relay_url.as_str(), reload_trick()).await
+    });
 
     rsx! {
         document::Link { rel: "stylesheet", href: QUEUE_CSS}
@@ -29,40 +30,60 @@ pub fn Queue() -> Element {
 
             match &*mod_queue.read_unchecked() {
                 Some(Ok(v)) => rsx! {
-                    for e in v.iter() {
+                    for e in v.iter().cloned() {
                         RenderedEvent {
                             e: e.clone(),
                             relay_url: relay_url.clone(),
                         }
                         Button {
-                            text: "Approve",
+                            text: "Allow",
                             onclick: move |event: Event<MouseData>| {
                                 event.stop_propagation(); // just the button, no deeper
-                                info!("Clicked Approve: {event:?}")
+                                let eventid = e.id;
+                                spawn(async move {
+                                    crate::nip86::allow_event(config().relay_url.as_str(), eventid).await;
+                                    reload_trick += 1;
+                                });
                             },
                             class: "default",
                         }
                         Button {
-                            text: "Approve User",
+                            text: "Allow User",
                             onclick: move |event: Event<MouseData>| {
                                 event.stop_propagation(); // just the button, no deeper
-                                info!("Clicked Approve User: {event:?}")
+                                let eventid = e.id;
+                                let eventpk = e.pubkey;
+                                spawn(async move {
+                                    crate::nip86::allow_pubkey(config().relay_url.as_str(), eventpk).await;
+                                    crate::nip86::allow_event(config().relay_url.as_str(), eventid).await;
+                                    reload_trick += 1;
+                                });
                             },
                             class: "default",
                         }
                         Button {
-                            text: "DELETE",
+                            text: "Ban",
                             onclick: move |event: Event<MouseData>| {
                                 event.stop_propagation(); // just the button, no deeper
-                                info!("Clicked DELETE: {event:?}")
+                                let eventid = e.id;
+                                spawn(async move {
+                                    crate::nip86::ban_event(config().relay_url.as_str(), eventid).await;
+                                    reload_trick += 1;
+                                });
                             },
                             class: "danger",
                         }
                         Button {
-                            text: "DELETE and BAN USER",
+                            text: "Ban event and user",
                             onclick: move |event: Event<MouseData>| {
                                 event.stop_propagation(); // just the button, no deeper
-                                info!("Clicked DELETE and BAN USER: {event:?}")
+                                let eventid = e.id;
+                                let eventpk = e.pubkey;
+                                spawn(async move {
+                                    crate::nip86::ban_pubkey(config().relay_url.as_str(), eventpk).await;
+                                    crate::nip86::ban_event(config().relay_url.as_str(), eventid).await;
+                                    reload_trick += 1;
+                                });
                             },
                             class: "danger",
                         }
