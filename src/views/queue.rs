@@ -45,7 +45,7 @@ pub fn Queue() -> Element {
                                     reload_trick += 1;
                                 });
                             },
-                            class: "default",
+                            class: "moderate default",
                         }
                         Button {
                             text: "Allow User",
@@ -59,7 +59,7 @@ pub fn Queue() -> Element {
                                     reload_trick += 1;
                                 });
                             },
-                            class: "default",
+                            class: "moderate default",
                         }
                         Button {
                             text: "Ban",
@@ -71,7 +71,7 @@ pub fn Queue() -> Element {
                                     reload_trick += 1;
                                 });
                             },
-                            class: "danger",
+                            class: "moderate danger",
                         }
                         Button {
                             text: "Ban event and user",
@@ -85,7 +85,7 @@ pub fn Queue() -> Element {
                                     reload_trick += 1;
                                 });
                             },
-                            class: "danger",
+                            class: "moderate danger",
                         }
                     }
                 },
