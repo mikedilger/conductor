@@ -1,3 +1,6 @@
+use crate::components::RenderedEvent;
+use crate::Config;
+use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -10,9 +13,36 @@ enum Tab {
 
 #[component]
 pub fn Marked() -> Element {
+    let config = use_context::<Signal<Config>>();
+    let relay_url = config().relay_url.as_str().to_owned();
+
+    let mut reload_trick = use_signal(|| 0);
 
     let mut tab = use_signal(|| Tab::BannedEvents);
-    // tab(), or just tab = X;
+
+    let events = use_resource(move || async move {
+        match tab() {
+            Tab::BannedEvents => {
+                crate::nip86::listbannedevents(config().relay_url.as_str(), reload_trick()).await
+            }
+            Tab::AllowedEvents => {
+                crate::nip86::listallowedevents(config().relay_url.as_str(), reload_trick()).await
+            }
+            _ => Ok(vec![]),
+        }
+    });
+
+    let pubkeys = use_resource(move || async move {
+        match tab() {
+            Tab::BannedUsers => {
+                crate::nip86::listbannedpubkeys(config().relay_url.as_str(), reload_trick()).await
+            }
+            Tab::AllowedUsers => {
+                crate::nip86::listallowedpubkeys(config().relay_url.as_str(), reload_trick()).await
+            }
+            _ => Ok(vec![]),
+        }
+    });
 
     rsx! {
         if tab() == Tab::BannedEvents {
@@ -85,31 +115,53 @@ pub fn Marked() -> Element {
         }
 
         match tab() {
-            Tab::BannedEvents => {
-                "Banned Events TBD"
+            Tab::BannedEvents | Tab::AllowedEvents => {
+                rsx! {
+                    match &*events.read_unchecked() {
+                        Some(Ok(v)) => rsx! {
+                            for e in v.iter().cloned() {
+                                RenderedEvent {
+                                    e: e.clone(),
+                                    relay_url: relay_url.clone(),
+                                }
+                            }
+                            div { "end." }
+                        },
+                        Some(Err(e)) => rsx! {
+                            "Loading failed: {e}"
+                        },
+                        None => rsx! {
+                            "Loading..."
+                        }
+                    }
+                }
             },
-            Tab::AllowedEvents => {
-                "Allowed Events TBD"
-            },
-            Tab::BannedUsers => {
-                "Banned Users TBD"
-            },
-            Tab::AllowedUsers => {
-                "Allowed Users TBD"
+            Tab::BannedUsers | Tab::AllowedUsers => {
+                rsx! {
+                    match &*pubkeys.read_unchecked() {
+                        Some(Ok(v)) => rsx! {
+                            for pk in v.iter().cloned() {
+                                div { "{pk}" }
+                            }
+                            div { "end." }
+                        },
+                        Some(Err(e)) => rsx! {
+                            "Loading failed: {e}"
+                        },
+                        None => rsx! {
+                            "Loading..."
+                        }
+                    }
+                }
             },
         }
     }
 }
 
-// Use these functions on this page:
+// Use these functions on this page in buttons:
 
 // allow_event
 // clear_event
 
 // allow_pubkey
 // clear_pubkey
-
-// listallowedevents
-// listbannedevents
-// listallowedpubkeys
-// listbannedpubkeys

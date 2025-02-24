@@ -230,6 +230,8 @@ pub async fn listallowedevents(
         return err("Result was not an array");
     };
 
+    info!("Loaded allowed events");
+
     let filter = id_list_to_filter(arr);
     get_events(url, filter).await
 }
@@ -251,6 +253,8 @@ pub async fn listbannedevents(
     let Value::Array(arr) = response.result else {
         return err("Result was not an array");
     };
+
+    info!("Loaded banned events");
 
     let filter = id_list_to_filter(arr);
     get_events(url, filter).await
@@ -274,6 +278,8 @@ pub async fn listallowedpubkeys(
         return err("Result was not an array");
     };
 
+    info!("Loaded allowed pubkeys");
+
     Ok(pubkey_list_to_vec(arr))
 }
 
@@ -294,6 +300,8 @@ pub async fn listbannedpubkeys(
     let Value::Array(arr) = response.result else {
         return err("Result was not an array");
     };
+
+    info!("Loaded banned pubkeys");
 
     Ok(pubkey_list_to_vec(arr))
 }

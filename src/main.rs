@@ -7,7 +7,7 @@ use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
 use serde::{Deserialize, Serialize};
-use views::{Marked, Help, Home, Info, Queue, Reports, Setup, Users};
+use views::{Help, Home, Info, Marked, Queue, Reports, Setup, Users};
 
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Config {

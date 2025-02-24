@@ -110,6 +110,9 @@ pub fn Queue() -> Element {
                             class: "moderate danger",
                         }
                     }
+                    div {
+                        "end."
+                    }
                 },
                 Some(Err(e)) => rsx! {
                     "Loading failed: {e}"
