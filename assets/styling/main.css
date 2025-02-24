@@ -36,6 +36,7 @@ div.relay {
     color: #ab8aff;
     font-style: italic;
     font-size: 1.2em;
-    margin-left: 2em;
+    padding-left: 1em;
     margin-bottom: 1em;
+    border-bottom: 1px dotted white;
 }

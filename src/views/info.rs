@@ -21,11 +21,6 @@ pub fn Info() -> Element {
             h1 { "Info" },
 
             div {
-                class: "relay",
-                "{relay_url}"
-            }
-
-            div {
                 id: "stats",
                 h2 { "Stats" },
                 match &*stats.read_unchecked() {

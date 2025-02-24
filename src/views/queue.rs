@@ -23,11 +23,6 @@ pub fn Queue() -> Element {
             id: "queue",
             h1 { "Moderation Queue" }
 
-            div {
-                class: "relay",
-                "{relay_url}"
-            }
-
             match &*mod_queue.read_unchecked() {
                 Some(Ok(v)) => rsx! {
                     for e in v.iter().cloned() {

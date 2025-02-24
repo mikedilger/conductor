@@ -8,6 +8,7 @@ const NAVBAR_CSS: Asset = asset!("/assets/styling/navbar.css");
 #[component]
 pub fn Navbar() -> Element {
     let config = use_context::<Signal<Config>>();
+    let relay_url = config().relay_url.as_str().to_owned();
 
     let browser_signer = BrowserSigner::new();
     let found_signer = browser_signer.is_ok();
@@ -46,6 +47,11 @@ pub fn Navbar() -> Element {
                     "Users"
                 }
             }
+        }
+
+        div {
+            class: "relay",
+            "{relay_url}"
         }
 
         Outlet::<Route> {}

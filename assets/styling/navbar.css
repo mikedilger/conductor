@@ -6,7 +6,10 @@
 
 #navbar a.title {
     font-size: 1.3em;
-    margin: 0px 30px 0px 0px;
+    margin: 0px 20px 0px 0px;
+    padding-left: 1em;
+    padding-right: 1em;
+    background-color: rgba(160, 70, 0, 1);
 }
 
 #navbar a {
