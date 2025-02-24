@@ -48,6 +48,33 @@ pub fn Queue() -> Element {
                             class: "moderate default",
                         }
                         Button {
+                            text: "Ban (but Keep)",
+                            onclick: move |event: Event<MouseData>| {
+                                event.stop_propagation(); // just the button, no deeper
+                                let eventid = e.id;
+                                spawn(async move {
+                                    crate::nip86::ban_event(config().relay_url.as_str(), eventid).await;
+                                    reload_trick += 1;
+                                });
+                            },
+                            class: "moderate milddanger",
+                        }
+                        Button {
+                            text: "Ban and Burn!",
+                            onclick: move |event: Event<MouseData>| {
+                                event.stop_propagation(); // just the button, no deeper
+                                let eventid = e.id;
+                                spawn(async move {
+                                    crate::nip86::ban_event(config().relay_url.as_str(), eventid).await;
+                                    crate::nip86::remove_event(config().relay_url.as_str(), eventid).await;
+                                    reload_trick += 1;
+                                });
+                            },
+                            class: "moderate danger",
+                        }
+                        br {
+                        }
+                        Button {
                             text: "Allow User",
                             onclick: move |event: Event<MouseData>| {
                                 event.stop_propagation(); // just the button, no deeper
@@ -62,26 +89,27 @@ pub fn Queue() -> Element {
                             class: "moderate default",
                         }
                         Button {
-                            text: "Ban",
-                            onclick: move |event: Event<MouseData>| {
-                                event.stop_propagation(); // just the button, no deeper
-                                let eventid = e.id;
-                                spawn(async move {
-                                    crate::nip86::ban_event(config().relay_url.as_str(), eventid).await;
-                                    reload_trick += 1;
-                                });
-                            },
-                            class: "moderate danger",
-                        }
-                        Button {
-                            text: "Ban event and user",
+                            text: "Ban User (Keep)",
                             onclick: move |event: Event<MouseData>| {
                                 event.stop_propagation(); // just the button, no deeper
                                 let eventid = e.id;
                                 let eventpk = e.pubkey;
                                 spawn(async move {
                                     crate::nip86::ban_pubkey(config().relay_url.as_str(), eventpk).await;
-                                    crate::nip86::ban_event(config().relay_url.as_str(), eventid).await;
+                                    reload_trick += 1;
+                                });
+                            },
+                            class: "moderate milddanger",
+                        }
+                        Button {
+                            text: "Ban User & Burn!",
+                            onclick: move |event: Event<MouseData>| {
+                                event.stop_propagation(); // just the button, no deeper
+                                let eventid = e.id;
+                                let eventpk = e.pubkey;
+                                spawn(async move {
+                                    crate::nip86::ban_pubkey(config().relay_url.as_str(), eventpk).await;
+                                    crate::nip86::remove_event(config().relay_url.as_str(), eventid).await;
                                     reload_trick += 1;
                                 });
                             },
