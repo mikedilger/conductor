@@ -40,14 +40,14 @@ pub fn Help() -> Element {
             ul {
                 li {
                     span {
-                        class: "bold",
+                        class: "term",
                         "moderator:"
                     }
                     "Moderators can moderate events. They can also ban and unban pubkeys (except pubkeys with a role assigned). Moderators are always also authorized users."
                 }
                 li {
                     span {
-                        class: "bold",
+                        class: "term",
                         "authorized user:"
                     }
                     "These users are the ones the relay is serving. Their events are immediately publicly visible, and they can see events in the moderation quere that the public cannot see. But they cannot moderate these events."
@@ -64,21 +64,21 @@ pub fn Help() -> Element {
             ul {
                 li {
                     span {
-                        class: "bold",
+                        class: "term",
                         "allowed pubkey:"
                     }
                     "This pubkey is allowed to post, and their posts are immediately visible (they bypass the moderation queue).  But they are not an authorized user, so they can only post in reply to an authorized user. Moderators can put any pubkey into this state."
                 }
                 li {
                     span {
-                        class: "bold",
+                        class: "term",
                         "banned pubkey:"
                     }
                     "This pubkey is not allowed to post, or else their events are insta-banned (I forget which). Moderators can put any pubkey into this state."
                 }
                 li {
                     span {
-                        class: "bold",
+                        class: "term",
                         "unlisted:"
                     }
                     "Unlisted users are treated as normal. They can reply to authorized users, but their replies land in the moderation queue and are not publicly visible until a moderator approves them."
@@ -93,21 +93,21 @@ pub fn Help() -> Element {
             ul {
                 li {
                     span {
-                        class: "bold",
+                        class: "term",
                         "allowed event:"
                     }
                     "These events are either allowed because they are authored by an authorized user, or else they were approved in moderation."
                 }
                 li {
                     span {
-                        class: "bold",
+                        class: "term",
                         "banned event:"
                     }
                     "These events were not authored by an authorized user, and they were banned in moderation. They still might be present on the relay but are not publicly visible."
                 }
                 li {
                     span {
-                        class: "bold",
+                        class: "term",
                         "unlisted (queued):"
                     }
                     "These events were not authored by an authorized user, and they are awaiting moderation."

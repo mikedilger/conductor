@@ -41,9 +41,17 @@ div.relay {
     border-bottom: 1px dotted white;
 }
 
-span.bold {
+span.term {
     font-weight: bold;
     margin-right: 1em;
+}
+
+span.tabs {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+span.selected {
+    font-weight: bold;
 }
 
 .underline {
