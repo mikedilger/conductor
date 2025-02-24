@@ -10,8 +10,8 @@ pub use info::Info;
 mod queue;
 pub use queue::Queue;
 
-mod banned;
-pub use banned::Banned;
+mod marked;
+pub use marked::Marked;
 
 mod reports;
 pub use reports::Reports;

@@ -39,8 +39,8 @@ pub fn Navbar() -> Element {
                     "Queue"
                 }
                 Link {
-                    to: Route::Banned {},
-                    "Banned"
+                    to: Route::Marked {},
+                    "Marked"
                 }
                 Link {
                     to: Route::Reports {},

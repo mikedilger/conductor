@@ -7,7 +7,7 @@ use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
 use serde::{Deserialize, Serialize};
-use views::{Banned, Help, Home, Info, Queue, Reports, Setup, Users};
+use views::{Marked, Help, Home, Info, Queue, Reports, Setup, Users};
 
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Config {
@@ -26,8 +26,8 @@ enum Route {
     Info,
     #[route("/queue")]
     Queue,
-    #[route("/banned")]
-    Banned,
+    #[route("/marked")]
+    Marked,
     #[route("/reports")]
     Reports,
     #[route("/users")]
