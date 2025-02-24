@@ -39,6 +39,10 @@ pub fn Navbar() -> Element {
                     "Queue"
                 }
                 Link {
+                    to: Route::Banned {},
+                    "Banned"
+                }
+                Link {
                     to: Route::Reports {},
                     "Reports"
                 }
@@ -46,6 +50,10 @@ pub fn Navbar() -> Element {
                     to: Route::Users {},
                     "Users"
                 }
+            }
+            Link {
+                to: Route::Help {},
+                "Help"
             }
         }
 

@@ -7,7 +7,7 @@ use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
 use dioxus_sdk::storage::*;
 use serde::{Deserialize, Serialize};
-use views::{Home, Info, Queue, Reports, Setup, Users};
+use views::{Banned, Help, Home, Info, Queue, Reports, Setup, Users};
 
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Config {
@@ -26,10 +26,14 @@ enum Route {
     Info,
     #[route("/queue")]
     Queue,
+    #[route("/banned")]
+    Banned,
     #[route("/reports")]
     Reports,
     #[route("/users")]
     Users,
+    #[route("/help")]
+    Help,
 }
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
