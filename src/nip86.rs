@@ -158,33 +158,8 @@ pub async fn mod_queue(
         return err("Result was not an array");
     };
 
-    let mut filter: Filter = Default::default();
-    for elem in arr.iter() {
-        if let Some(map) = elem.as_object() {
-            if let Some(val) = map.get("id") {
-                if let Some(idstr) = val.as_str() {
-                    if let Ok(id) = EventId::parse(idstr) {
-                        filter = filter.id(id);
-                    }
-                }
-            }
-        }
-    }
-
-    if filter.is_empty() {
-        return Ok(vec![]);
-    }
-
-    let client = NostrClient::default();
-    client.set_signer(BrowserSigner::new()?).await;
-    client.add_relay(url).await?;
-    client.connect().await;
-    let events = client
-        .fetch_events(filter, Duration::from_secs(5))
-        .await?
-        .to_vec();
-
-    Ok(events)
+    let filter = id_list_to_filter(arr);
+    get_events(url, filter).await
 }
 
 pub async fn allow_event(url: &str, id: EventId) -> Result<(), Box<dyn std::error::Error>> {
@@ -235,4 +210,139 @@ pub async fn clear_pubkey(url: &str, pubkey: PublicKey) -> Result<(), Box<dyn st
     info!("{response:?}");
 
     Ok(())
+}
+
+pub async fn listallowedevents(
+    url: &str,
+    _reload_trick: usize,
+) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "listallowedevents", json!([])).await?;
+
+    let err = |s| -> Result<Vec<Event>, Box<dyn std::error::Error>> {
+        Err(Box::new(std::io::Error::other(s)))
+    };
+
+    if let Some(err) = response.error {
+        return Err(Box::new(std::io::Error::other(err)));
+    }
+
+    let Value::Array(arr) = response.result else {
+        return err("Result was not an array");
+    };
+
+    let filter = id_list_to_filter(arr);
+    get_events(url, filter).await
+}
+
+pub async fn listbannedevents(
+    url: &str,
+    _reload_trick: usize,
+) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "listbannedevents", json!([])).await?;
+
+    let err = |s| -> Result<Vec<Event>, Box<dyn std::error::Error>> {
+        Err(Box::new(std::io::Error::other(s)))
+    };
+
+    if let Some(err) = response.error {
+        return Err(Box::new(std::io::Error::other(err)));
+    }
+
+    let Value::Array(arr) = response.result else {
+        return err("Result was not an array");
+    };
+
+    let filter = id_list_to_filter(arr);
+    get_events(url, filter).await
+}
+
+pub async fn listallowedpubkeys(
+    url: &str,
+    _reload_trick: usize,
+) -> Result<Vec<PublicKey>, Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "listallowedpubkeys", json!([])).await?;
+
+    let err = |s| -> Result<Vec<PublicKey>, Box<dyn std::error::Error>> {
+        Err(Box::new(std::io::Error::other(s)))
+    };
+
+    if let Some(err) = response.error {
+        return Err(Box::new(std::io::Error::other(err)));
+    }
+
+    let Value::Array(arr) = response.result else {
+        return err("Result was not an array");
+    };
+
+    Ok(pubkey_list_to_vec(arr))
+}
+
+pub async fn listbannedpubkeys(
+    url: &str,
+    _reload_trick: usize,
+) -> Result<Vec<PublicKey>, Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "listbannedpubkeys", json!([])).await?;
+
+    let err = |s| -> Result<Vec<PublicKey>, Box<dyn std::error::Error>> {
+        Err(Box::new(std::io::Error::other(s)))
+    };
+
+    if let Some(err) = response.error {
+        return Err(Box::new(std::io::Error::other(err)));
+    }
+
+    let Value::Array(arr) = response.result else {
+        return err("Result was not an array");
+    };
+
+    Ok(pubkey_list_to_vec(arr))
+}
+
+fn pubkey_list_to_vec(arr: Vec<Value>) -> Vec<PublicKey> {
+    let mut output: Vec<PublicKey> = Vec::new();
+    for elem in arr.iter() {
+        if let Some(map) = elem.as_object() {
+            if let Some(val) = map.get("pubkey") {
+                if let Some(pkstr) = val.as_str() {
+                    if let Ok(pk) = PublicKey::parse(pkstr) {
+                        output.push(pk)
+                    }
+                }
+            }
+        }
+    }
+    output
+}
+
+fn id_list_to_filter(arr: Vec<Value>) -> Filter {
+    let mut filter: Filter = Default::default();
+    for elem in arr.iter() {
+        if let Some(map) = elem.as_object() {
+            if let Some(val) = map.get("id") {
+                if let Some(idstr) = val.as_str() {
+                    if let Ok(id) = EventId::parse(idstr) {
+                        filter = filter.id(id);
+                    }
+                }
+            }
+        }
+    }
+    filter
+}
+
+async fn get_events(url: &str, filter: Filter) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
+    if filter.is_empty() {
+        return Ok(vec![]);
+    }
+
+    let client = NostrClient::default();
+    client.set_signer(BrowserSigner::new()?).await;
+    client.add_relay(url).await?;
+    client.connect().await;
+    let events = client
+        .fetch_events(filter, Duration::from_secs(5))
+        .await?
+        .to_vec();
+
+    Ok(events)
 }
