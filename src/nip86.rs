@@ -201,6 +201,20 @@ pub async fn ban_event(url: &str, id: EventId) -> Result<(), Box<dyn std::error:
     Ok(())
 }
 
+pub async fn clear_event(url: &str, id: EventId) -> Result<(), Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "clearevent", json!([id,])).await?;
+    info!("{response:?}");
+
+    Ok(())
+}
+
+pub async fn remove_event(url: &str, id: EventId) -> Result<(), Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "removeevent", json!([id,])).await?;
+    info!("{response:?}");
+
+    Ok(())
+}
+
 pub async fn allow_pubkey(url: &str, pubkey: PublicKey) -> Result<(), Box<dyn std::error::Error>> {
     let response =
         run_command_on_relay(url, "allowpubkey", json!([pubkey, "unspecified",])).await?;
@@ -211,6 +225,13 @@ pub async fn allow_pubkey(url: &str, pubkey: PublicKey) -> Result<(), Box<dyn st
 
 pub async fn ban_pubkey(url: &str, pubkey: PublicKey) -> Result<(), Box<dyn std::error::Error>> {
     let response = run_command_on_relay(url, "banpubkey", json!([pubkey, "unspecified",])).await?;
+    info!("{response:?}");
+
+    Ok(())
+}
+
+pub async fn clear_pubkey(url: &str, pubkey: PublicKey) -> Result<(), Box<dyn std::error::Error>> {
+    let response = run_command_on_relay(url, "clearpubkey", json!([pubkey,])).await?;
     info!("{response:?}");
 
     Ok(())
