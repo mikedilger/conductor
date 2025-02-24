@@ -77,7 +77,6 @@ pub fn Queue() -> Element {
                                 let eventpk = e.pubkey;
                                 spawn(async move {
                                     crate::nip86::allow_pubkey(config().relay_url.as_str(), eventpk).await;
-                                    crate::nip86::allow_event(config().relay_url.as_str(), eventid).await;
                                     reload_trick += 1;
                                 });
                             },
