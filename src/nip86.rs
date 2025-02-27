@@ -240,7 +240,7 @@ pub async fn listbannedevents(
     url: &str,
     _reload_trick: usize,
 ) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
-    let response = run_command_on_relay(url, "listbannedevents", json!([])).await?;
+    let response = run_command_on_relay(url, "listbannedevents2", json!([])).await?;
 
     let err = |s| -> Result<Vec<Event>, Box<dyn std::error::Error>> {
         Err(Box::new(std::io::Error::other(s)))
@@ -256,8 +256,19 @@ pub async fn listbannedevents(
 
     info!("Loaded banned events");
 
-    let filter = id_list_to_filter(arr);
-    get_events(url, filter).await
+    let mut events: Vec<Event> = Vec::new();
+    for elem in arr.iter() {
+        if let Some(map) = elem.as_object() {
+            if let Some(val) = map.get("event") {
+                if let Some(s) = val.as_str() {
+                    let event = nostr::Event::from_json(s)?;
+                    events.push(event);
+                }
+            }
+        }
+    }
+
+    Ok(events)
 }
 
 pub async fn listallowedpubkeys(
