@@ -1,4 +1,4 @@
-use crate::components::RenderedEvent;
+use crate::components::{Button, ButtonProps, RenderedEvent};
 use crate::Config;
 use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
@@ -115,7 +115,7 @@ pub fn Marked() -> Element {
         }
 
         match tab() {
-            Tab::BannedEvents | Tab::AllowedEvents => {
+            Tab::BannedEvents => {
                 rsx! {
                     match &*events.read_unchecked() {
                         Some(Ok(v)) => rsx! {
@@ -123,6 +123,75 @@ pub fn Marked() -> Element {
                                 RenderedEvent {
                                     e: e.clone(),
                                     relay_url: relay_url.clone(),
+                                }
+                                Button {
+                                    text: "Allow",
+                                    onclick: move |event: Event<MouseData>| {
+                                        event.stop_propagation(); // just the button, no deeper
+                                        let eventid = e.id;
+                                        spawn(async move {
+                                            crate::nip86::allow_event(config().relay_url.as_str(), eventid).await;
+                                            reload_trick += 1;
+                                        });
+                                    },
+                                    class: "moderate milddanger",
+                                }
+                                Button {
+                                    text: "Return to Queue",
+                                    onclick: move |event: Event<MouseData>| {
+                                        event.stop_propagation(); // just the button, no deeper
+                                        let eventid = e.id;
+                                        spawn(async move {
+                                            crate::nip86::clear_event(config().relay_url.as_str(), eventid).await;
+                                            reload_trick += 1;
+                                        });
+                                    },
+                                    class: "moderate milddanger",
+                                }
+                            }
+                            div { "end." }
+                        },
+                        Some(Err(e)) => rsx! {
+                            "Loading failed: {e}"
+                        },
+                        None => rsx! {
+                            "Loading..."
+                        }
+                    }
+                }
+            },
+            Tab::AllowedEvents => {
+                rsx! {
+                    match &*events.read_unchecked() {
+                        Some(Ok(v)) => rsx! {
+                            for e in v.iter().cloned() {
+                                RenderedEvent {
+                                    e: e.clone(),
+                                    relay_url: relay_url.clone(),
+                                }
+                                Button {
+                                    text: "Ban",
+                                    onclick: move |event: Event<MouseData>| {
+                                        event.stop_propagation(); // just the button, no deeper
+                                        let eventid = e.id;
+                                        spawn(async move {
+                                            crate::nip86::ban_event(config().relay_url.as_str(), eventid).await;
+                                            reload_trick += 1;
+                                        });
+                                    },
+                                    class: "moderate milddanger",
+                                }
+                                Button {
+                                    text: "Return to Queue",
+                                    onclick: move |event: Event<MouseData>| {
+                                        event.stop_propagation(); // just the button, no deeper
+                                        let eventid = e.id;
+                                        spawn(async move {
+                                            crate::nip86::clear_event(config().relay_url.as_str(), eventid).await;
+                                            reload_trick += 1;
+                                        });
+                                    },
+                                    class: "moderate milddanger",
                                 }
                             }
                             div { "end." }

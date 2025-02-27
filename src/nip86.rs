@@ -230,10 +230,14 @@ pub async fn listallowedevents(
         return err("Result was not an array");
     };
 
-    info!("Loaded allowed events");
+    info!("Loaded {} allowed event IDs", arr.len());
 
     let filter = id_list_to_filter(arr);
-    get_events(url, filter).await
+    let events = get_events(url, filter).await?;
+
+    info!("Loaded {} allowed events", events.len());
+
+    Ok(events)
 }
 
 pub async fn listbannedevents(
@@ -254,7 +258,7 @@ pub async fn listbannedevents(
         return err("Result was not an array");
     };
 
-    info!("Loaded banned events");
+    info!("Loaded {} banned events", arr.len());
 
     let mut events: Vec<Event> = Vec::new();
     for elem in arr.iter() {
