@@ -205,12 +205,52 @@ pub fn Marked() -> Element {
                     }
                 }
             },
-            Tab::BannedUsers | Tab::AllowedUsers => {
+            Tab::BannedUsers  => {
                 rsx! {
                     match &*pubkeys.read_unchecked() {
                         Some(Ok(v)) => rsx! {
                             for pk in v.iter().cloned() {
                                 div { "{pk}" }
+                                Button {
+                                    text: "Clear ban",
+                                    onclick: move |event: Event<MouseData>| {
+                                        event.stop_propagation(); // just the button, no deeper
+                                        spawn(async move {
+                                            crate::nip86::clear_pubkey(config().relay_url.as_str(), pk).await;
+                                            reload_trick += 1;
+                                        });
+                                    },
+                                    class: "moderate milddanger",
+                                }
+                            }
+                            div { "end." }
+                        },
+                        Some(Err(e)) => rsx! {
+                            "Loading failed: {e}"
+                        },
+                        None => rsx! {
+                            "Loading..."
+                        }
+                    }
+                }
+            },
+            Tab::AllowedUsers => {
+                rsx! {
+                    match &*pubkeys.read_unchecked() {
+                        Some(Ok(v)) => rsx! {
+                            for pk in v.iter().cloned() {
+                                div { "{pk}" }
+                                Button {
+                                    text: "Clear allowance",
+                                    onclick: move |event: Event<MouseData>| {
+                                        event.stop_propagation(); // just the button, no deeper
+                                        spawn(async move {
+                                            crate::nip86::clear_pubkey(config().relay_url.as_str(), pk).await;
+                                            reload_trick += 1;
+                                        });
+                                    },
+                                    class: "moderate milddanger",
+                                }
                             }
                             div { "end." }
                         },
