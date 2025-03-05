@@ -1,3 +1,5 @@
+use crate::Context;
+use crate::components::UserLine;
 use dioxus::prelude::*;
 use nostr::event::Event;
 
@@ -5,6 +7,8 @@ const EVENT_CSS: Asset = asset!("/assets/styling/event.css");
 
 #[component]
 pub fn RenderedEvent(e: Event, relay_url: String) -> Element {
+    let mut context: Context = use_context::<Context>();
+
     let nevent = nostr::nips::nip21::Nip21::Event(nostr::nips::nip19::Nip19Event {
         event_id: e.id,
         author: Some(e.pubkey),
@@ -13,6 +17,20 @@ pub fn RenderedEvent(e: Event, relay_url: String) -> Element {
     })
     .to_nostr_uri()
     .unwrap();
+
+    let metadata = use_resource(move || async move {
+        match crate::nostr::get_metadata(
+            e.pubkey,
+            context.config.read().relay_url.clone()
+        ).await {
+            Err(e) => {
+                context.errors.write().push(format!("{e}"));
+                None
+            },
+            Ok(opt) => opt
+        }
+    });
+
 
     let npub = nostr::nips::nip21::Nip21::Pubkey(e.pubkey)
         .to_nostr_uri()
@@ -43,6 +61,10 @@ pub fn RenderedEvent(e: Event, relay_url: String) -> Element {
                     class: "pubkey",
                     "{e.pubkey}"
                 }
+            }
+
+            UserLine {
+                m: metadata.read_unchecked().clone()
             }
 
             div {
