@@ -10,9 +10,15 @@ use dioxus_sdk::storage::*;
 use serde::{Deserialize, Serialize};
 use views::{Help, Home, Info, Marked, Queue, Reports, Setup, Users};
 
-#[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Config {
     pub relay_url: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct Context {
+    pub config: Signal<Config>,
+    pub errors: Signal<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -49,7 +55,11 @@ fn main() {
 fn App() -> Element {
     let config =
         use_synced_storage::<LocalStorage, Config>("config".to_string(), || Default::default());
-    use_context_provider(|| config);
+
+    let _context = use_context_provider(|| Context {
+        config,
+        errors: Signal::new(vec![]),
+    });
 
     info!("App started");
 

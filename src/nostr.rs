@@ -39,7 +39,10 @@ pub fn pubkey_list_to_vec(arr: Vec<Value>) -> Vec<PublicKey> {
     output
 }
 
-pub async fn get_events(url: &str, filter: Filter) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
+pub async fn get_events(
+    url: &str,
+    filter: Filter,
+) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
     if filter.is_empty() {
         return Ok(vec![]);
     }

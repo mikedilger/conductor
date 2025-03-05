@@ -1,5 +1,5 @@
 use crate::components::{Button, RenderedEvent};
-use crate::Config;
+use crate::Context;
 use dioxus::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,8 +12,7 @@ enum Tab {
 
 #[component]
 pub fn Marked() -> Element {
-    let config = use_context::<Signal<Config>>();
-    let relay_url = config().relay_url.as_str().to_owned();
+    let mut context: Context = use_context::<Context>();
 
     let mut reload_trick = use_signal(|| 0);
 
@@ -22,10 +21,18 @@ pub fn Marked() -> Element {
     let events = use_resource(move || async move {
         match tab() {
             Tab::BannedEvents => {
-                crate::nip86::listbannedevents(config().relay_url.as_str(), reload_trick()).await
+                crate::nip86::listbannedevents(
+                    context.config.read().relay_url.as_str(),
+                    reload_trick(),
+                )
+                .await
             }
             Tab::AllowedEvents => {
-                crate::nip86::listallowedevents(config().relay_url.as_str(), reload_trick()).await
+                crate::nip86::listallowedevents(
+                    context.config.read().relay_url.as_str(),
+                    reload_trick(),
+                )
+                .await
             }
             _ => Ok(vec![]),
         }
@@ -34,10 +41,18 @@ pub fn Marked() -> Element {
     let pubkeys = use_resource(move || async move {
         match tab() {
             Tab::BannedUsers => {
-                crate::nip86::listbannedpubkeys(config().relay_url.as_str(), reload_trick()).await
+                crate::nip86::listbannedpubkeys(
+                    context.config.read().relay_url.as_str(),
+                    reload_trick(),
+                )
+                .await
             }
             Tab::AllowedUsers => {
-                crate::nip86::listallowedpubkeys(config().relay_url.as_str(), reload_trick()).await
+                crate::nip86::listallowedpubkeys(
+                    context.config.read().relay_url.as_str(),
+                    reload_trick(),
+                )
+                .await
             }
             _ => Ok(vec![]),
         }
@@ -121,7 +136,7 @@ pub fn Marked() -> Element {
                             for e in v.iter().cloned() {
                                 RenderedEvent {
                                     e: e.clone(),
-                                    relay_url: relay_url.clone(),
+                                    relay_url: context.config.read().relay_url.clone(),
                                 }
                                 Button {
                                     text: "Allow",
@@ -129,7 +144,9 @@ pub fn Marked() -> Element {
                                         event.stop_propagation(); // just the button, no deeper
                                         let eventid = e.id;
                                         spawn(async move {
-                                            crate::nip86::allow_event(config().relay_url.as_str(), eventid).await;
+                                            if let Err(e) = crate::nip86::allow_event(context.config.read().relay_url.as_str(), eventid).await {
+                                                context.errors.write().push(format!("{e}"));
+                                            }
                                             reload_trick += 1;
                                         });
                                     },
@@ -141,7 +158,9 @@ pub fn Marked() -> Element {
                                         event.stop_propagation(); // just the button, no deeper
                                         let eventid = e.id;
                                         spawn(async move {
-                                            crate::nip86::clear_event(config().relay_url.as_str(), eventid).await;
+                                            if let Err(e) = crate::nip86::clear_event(context.config.read().relay_url.as_str(), eventid).await {
+                                                context.errors.write().push(format!("{e}"));
+                                            }
                                             reload_trick += 1;
                                         });
                                     },
@@ -166,7 +185,7 @@ pub fn Marked() -> Element {
                             for e in v.iter().cloned() {
                                 RenderedEvent {
                                     e: e.clone(),
-                                    relay_url: relay_url.clone(),
+                                    relay_url: context.config.read().relay_url.clone(),
                                 }
                                 Button {
                                     text: "Ban",
@@ -174,7 +193,9 @@ pub fn Marked() -> Element {
                                         event.stop_propagation(); // just the button, no deeper
                                         let eventid = e.id;
                                         spawn(async move {
-                                            crate::nip86::ban_event(config().relay_url.as_str(), eventid).await;
+                                            if let Err(e) = crate::nip86::ban_event(context.config.read().relay_url.as_str(), eventid).await {
+                                                context.errors.write().push(format!("{e}"));
+                                            }
                                             reload_trick += 1;
                                         });
                                     },
@@ -186,7 +207,9 @@ pub fn Marked() -> Element {
                                         event.stop_propagation(); // just the button, no deeper
                                         let eventid = e.id;
                                         spawn(async move {
-                                            crate::nip86::clear_event(config().relay_url.as_str(), eventid).await;
+                                            if let Err(e) = crate::nip86::clear_event(context.config.read().relay_url.as_str(), eventid).await {
+                                                context.errors.write().push(format!("{e}"));
+                                            }
                                             reload_trick += 1;
                                         });
                                     },
@@ -215,7 +238,9 @@ pub fn Marked() -> Element {
                                     onclick: move |event: Event<MouseData>| {
                                         event.stop_propagation(); // just the button, no deeper
                                         spawn(async move {
-                                            crate::nip86::clear_pubkey(config().relay_url.as_str(), pk).await;
+                                            if let Err(e) = crate::nip86::clear_pubkey(context.config.read().relay_url.as_str(), pk).await {
+                                                context.errors.write().push(format!("{e}"));
+                                            }
                                             reload_trick += 1;
                                         });
                                     },
@@ -244,7 +269,9 @@ pub fn Marked() -> Element {
                                     onclick: move |event: Event<MouseData>| {
                                         event.stop_propagation(); // just the button, no deeper
                                         spawn(async move {
-                                            crate::nip86::clear_pubkey(config().relay_url.as_str(), pk).await;
+                                            if let Err(e) = crate::nip86::clear_pubkey(context.config.read().relay_url.as_str(), pk).await {
+                                                context.errors.write().push(format!("{e}"));
+                                            }
                                             reload_trick += 1;
                                         });
                                     },
