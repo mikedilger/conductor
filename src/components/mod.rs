@@ -1,5 +1,5 @@
 mod button;
-pub use button::{Button, ButtonProps};
+pub use button::Button;
 
 mod rendered_event;
 pub use rendered_event::RenderedEvent;

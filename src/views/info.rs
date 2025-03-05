@@ -8,7 +8,7 @@ const INFO_CSS: Asset = asset!("/assets/styling/info.css");
 #[component]
 pub fn Info() -> Element {
     let config = use_context::<Signal<Config>>();
-    let relay_url = config().relay_url.as_str().to_owned();
+    //let relay_url = config().relay_url.as_str().to_owned();
 
     let stats =
         use_resource(move || async move { crate::nip86::stats(config().relay_url.as_str()).await });

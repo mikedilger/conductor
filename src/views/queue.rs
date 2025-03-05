@@ -1,6 +1,5 @@
-use crate::components::{Button, ButtonProps, RenderedEvent};
+use crate::components::{Button, RenderedEvent};
 use crate::Config;
-use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
 
 const QUEUE_CSS: Asset = asset!("/assets/styling/queue.css");
@@ -73,7 +72,6 @@ pub fn Queue() -> Element {
                             text: "Allow User",
                             onclick: move |event: Event<MouseData>| {
                                 event.stop_propagation(); // just the button, no deeper
-                                let eventid = e.id;
                                 let eventpk = e.pubkey;
                                 spawn(async move {
                                     crate::nip86::allow_pubkey(config().relay_url.as_str(), eventpk).await;
@@ -86,7 +84,6 @@ pub fn Queue() -> Element {
                             text: "Ban User (Keep)",
                             onclick: move |event: Event<MouseData>| {
                                 event.stop_propagation(); // just the button, no deeper
-                                let eventid = e.id;
                                 let eventpk = e.pubkey;
                                 spawn(async move {
                                     crate::nip86::ban_pubkey(config().relay_url.as_str(), eventpk).await;

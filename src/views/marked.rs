@@ -1,6 +1,5 @@
-use crate::components::{Button, ButtonProps, RenderedEvent};
+use crate::components::{Button, RenderedEvent};
 use crate::Config;
-use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,7 +52,7 @@ pub fn Marked() -> Element {
         } else {
             span {
                 class: "tabs",
-                onclick: move |event: Event<MouseData>| {
+                onclick: move |_event: Event<MouseData>| {
                     tab.set(Tab::BannedEvents);
                 },
                 "Banned Events",
@@ -70,7 +69,7 @@ pub fn Marked() -> Element {
         } else {
             span {
                 class: "tabs",
-                onclick: move |event: Event<MouseData>| {
+                onclick: move |_event: Event<MouseData>| {
                     tab.set(Tab::AllowedEvents);
                 },
                 "Allowed Events"
@@ -87,7 +86,7 @@ pub fn Marked() -> Element {
         } else {
             span {
                 class: "tabs",
-                onclick: move |event: Event<MouseData>| {
+                onclick: move |_event: Event<MouseData>| {
                     tab.set(Tab::BannedUsers);
                 },
                 "Banned Users"
@@ -104,7 +103,7 @@ pub fn Marked() -> Element {
         } else {
             span {
                 class: "tabs",
-                onclick: move |event: Event<MouseData>| {
+                onclick: move |_event: Event<MouseData>| {
                     tab.set(Tab::AllowedUsers);
                 },
                 "Allowed Users"

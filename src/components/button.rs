@@ -1,6 +1,4 @@
-use dioxus::logger::tracing::info;
 use dioxus::prelude::*;
-use nostr::event::Event;
 
 const BUTTON_CSS: Asset = asset!("/assets/styling/button.css");
 

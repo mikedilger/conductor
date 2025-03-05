@@ -1,6 +1,5 @@
 use dioxus::prelude::*;
 use nostr::event::Event;
-use serde_json::Value;
 
 const EVENT_CSS: Asset = asset!("/assets/styling/event.css");
 

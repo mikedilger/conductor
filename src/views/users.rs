@@ -1,11 +1,11 @@
-use crate::Config;
+//use crate::Config;
 use dioxus::prelude::*;
 
 const USERS_CSS: Asset = asset!("/assets/styling/users.css");
 
 #[component]
 pub fn Users() -> Element {
-    let config = use_context::<Signal<Config>>();
+    //let config = use_context::<Signal<Config>>();
 
     rsx! {
 
