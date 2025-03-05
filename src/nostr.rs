@@ -1,7 +1,10 @@
+use lazy_static::lazy_static;
+use dashmap::DashMap;
 use nostr::event::id::EventId;
-use nostr::event::Event;
+use nostr::event::{Event, Kind};
 use nostr::filter::Filter;
 use nostr::key::public_key::PublicKey;
+use nostr::nips::nip01::Metadata;
 use nostr::nips::nip07::BrowserSigner;
 use nostr_sdk::Client as NostrClient;
 use serde_json::Value;
@@ -57,4 +60,60 @@ pub async fn get_events(
         .to_vec();
 
     Ok(events)
+}
+
+lazy_static! {
+    static ref METADATA: DashMap<PublicKey, Option<Metadata>> = {
+        DashMap::new()
+    };
+}
+
+pub async fn get_metadata(pubkey: PublicKey, starting_relay_url: String) ->
+    Result<Option<Metadata>, Box<dyn std::error::Error>>
+{
+    if let Some(optmd) = METADATA.get(&pubkey) {
+        return Ok(optmd.clone());
+    }
+
+    let filter: Filter = Filter::default()
+        .author(pubkey)
+        .kind(Kind::RelayList);
+    let events = get_events(&*starting_relay_url, filter).await?;
+    if events.is_empty() {
+        METADATA.insert(pubkey, None);
+        return Ok(None);
+    }
+
+    // collect 'r' tags that have no marker or that have a 'read' marker.
+    let mut relays: Vec<String> = vec![];
+    for tag in events[0].tags.iter().cloned() {
+        let fields = tag.to_vec();
+        if fields.get(0) == Some(&"r".to_string()) {
+            if let Some(url) = fields.get(1) {
+                if fields.get(2) == None || fields.get(2) == Some(&"read".to_owned()) {
+                    relays.push(url.to_owned());
+                }
+            }
+        }
+    }
+    if relays.is_empty() {
+        METADATA.insert(pubkey, None);
+        return Ok(None);
+    }
+
+    // get metadata
+    let filter: Filter = Filter::default()
+        .author(pubkey)
+        .kind(Kind::Metadata);
+    let events = get_events(&*relays[0], filter).await?;
+    if events.is_empty() {
+        METADATA.insert(pubkey, None);
+        return Ok(None);
+    }
+
+    let metadata: Metadata = serde_json::from_str(&events[0].content)?;
+
+    METADATA.insert(pubkey, Some(metadata.clone()));
+
+    Ok(Some(metadata))
 }

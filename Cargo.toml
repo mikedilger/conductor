@@ -11,9 +11,11 @@ repository = "https://github.com/mikedilger/conductor"
 
 [dependencies]
 base64 = "0.22"
+dashmap = "6.1"
 dioxus = { version = "0.6", features = ["router"] }
 dioxus-sdk = { version = "0.6", features = ["storage"] }
 http = "1.2"
+lazy_static = "1.5"
 nostr = { version = "0.39", features = ["std", "nip07", "nip98"] }
 nostr-sdk = { version = "0.39", features = ["nip07", "nip98"] }
 reqwest = { version = "0.12", features = [ "rustls-tls-native-roots" ] }
