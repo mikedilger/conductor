@@ -1,5 +1,6 @@
 mod components;
 mod nip86;
+mod nostr;
 mod views;
 
 use components::Navbar;
