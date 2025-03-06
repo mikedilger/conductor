@@ -68,7 +68,7 @@ lazy_static! {
     };
 }
 
-pub async fn get_metadata(pubkey: PublicKey, starting_relay_url: String) ->
+pub async fn get_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     Result<Option<Metadata>, Box<dyn std::error::Error>>
 {
     if let Some(optmd) = METADATA.get(&pubkey) {
@@ -78,7 +78,7 @@ pub async fn get_metadata(pubkey: PublicKey, starting_relay_url: String) ->
     let filter: Filter = Filter::default()
         .author(pubkey)
         .kind(Kind::RelayList);
-    let events = get_events(&*starting_relay_url, filter).await?;
+    let events = get_events(&*discovery_relay_url, filter).await?;
     if events.is_empty() {
         METADATA.insert(pubkey, None);
         return Ok(None);

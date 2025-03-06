@@ -12,6 +12,7 @@ pub fn Setup() -> Element {
     let browser_signer = BrowserSigner::new();
     let found_signer = browser_signer.is_ok();
     let url_is_ok = RelayUrl::parse(context.config.read().relay_url.as_str()).is_ok();
+    let discovery_url_is_ok = RelayUrl::parse(context.config.read().discovery_relay_url.as_str()).is_ok();
 
     rsx! {
         document::Link { rel: "stylesheet", href: SETUP_CSS}
@@ -22,26 +23,31 @@ pub fn Setup() -> Element {
             div {
                 class: "paragraph",
 
-                if url_is_ok && found_signer {
+                if url_is_ok && discovery_url_is_ok && found_signer {
                     "Setup is ",
                     span {
                         class: "success",
                         "OK"
                     }
-                } else if found_signer {
-                    span {
-                        class: "failure",
-                        "Enter a valid relay url below"
-                    }
-                } else if url_is_ok {
+                } else if !found_signer {
                     span {
                         class: "failure",
                         "Setup a NIP-07 browser signer"
                     }
+                } else if !url_is_ok {
+                    span {
+                        class: "failure",
+                        "Enter a valid relay url below"
+                    }
+                } else if !discovery_url_is_ok {
+                    span {
+                        class: "failure",
+                        "Enter a valid discovery relay url below"
+                    }
                 } else {
                     span {
                         class: "failure",
-                        "Nothing is setup!"
+                        "UNREACHABLE"
                     }
                 }
             }
@@ -54,6 +60,18 @@ pub fn Setup() -> Element {
                     value: "{context.config.read().relay_url}",
                     oninput: move |event| {
                         context.config.write().relay_url = event.value();
+                    },
+                }
+            }
+
+            div {
+                class: "paragraph",
+                "Discovery Relay Url: ",
+                input {
+                    size: 100,
+                    value: "{context.config.read().discovery_relay_url}",
+                    oninput: move |event| {
+                        context.config.write().discovery_relay_url = event.value();
                     },
                 }
             }

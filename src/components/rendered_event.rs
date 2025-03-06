@@ -21,7 +21,7 @@ pub fn RenderedEvent(e: Event, relay_url: String) -> Element {
     let metadata = use_resource(move || async move {
         match crate::nostr::get_metadata(
             e.pubkey,
-            context.config.read().relay_url.clone()
+            context.config.read().discovery_relay_url.clone()
         ).await {
             Err(e) => {
                 context.errors.write().push(format!("{e}"));

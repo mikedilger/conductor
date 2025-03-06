@@ -13,6 +13,7 @@ use views::{Help, Home, Info, Marked, Queue, Reports, Setup, Users};
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Config {
     pub relay_url: String,
+    pub discovery_relay_url: String,
 }
 
 #[derive(Debug, Clone)]
