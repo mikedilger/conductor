@@ -50,9 +50,15 @@ pub async fn get_events(
         return Ok(vec![]);
     }
 
-    let client = NostrClient::default();
-    client.set_signer(BrowserSigner::new()?).await;
-    client.add_relay(url).await?;
+    // Create client in CLIENTS if missing
+    if ! CLIENTS.contains_key(url) {
+        let client = NostrClient::default();
+        client.set_signer(BrowserSigner::new()?).await;
+        client.add_relay(url).await?;
+        CLIENTS.insert(url.to_owned(), client);
+    }
+
+    let client = CLIENTS.get(url).unwrap();
     client.connect().await;
     let events = client
         .fetch_events(filter, Duration::from_secs(5))
@@ -66,7 +72,12 @@ lazy_static! {
     static ref METADATA: DashMap<PublicKey, Option<Metadata>> = {
         DashMap::new()
     };
+
+    static ref CLIENTS: DashMap<String, NostrClient> = {
+        DashMap::new()
+    };
 }
+
 
 pub async fn get_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     Result<Option<Metadata>, Box<dyn std::error::Error>>
