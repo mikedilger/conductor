@@ -57,3 +57,20 @@ span.selected {
 .underline {
     text-decoration: underline;
 }
+
+.indent {
+    margin-left: 2em;
+}
+
+span.name {
+    font-size: 1.2em;
+    color: #ffe000;
+    border: 1px solid grey;
+}
+
+span.placeholder {
+    font-size: 1.2em;
+    font-style: italic;
+    color: #f0f0f0;
+}
+

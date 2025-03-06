@@ -1,4 +1,4 @@
-use crate::components::{Button, RenderedEvent};
+use crate::components::{Button, RenderedEvent, UserLine};
 use crate::Context;
 use dioxus::prelude::*;
 
@@ -138,33 +138,35 @@ pub fn Marked() -> Element {
                                     e: e.clone(),
                                     relay_url: context.config.read().relay_url.clone(),
                                 }
-                                Button {
-                                    text: "Allow",
-                                    onclick: move |event: Event<MouseData>| {
-                                        event.stop_propagation(); // just the button, no deeper
-                                        let eventid = e.id;
-                                        spawn(async move {
-                                            if let Err(e) = crate::nip86::allow_event(context.config.read().relay_url.as_str(), eventid).await {
-                                                context.errors.write().push(format!("{e}"));
-                                            }
-                                            reload_trick += 1;
-                                        });
-                                    },
-                                    class: "moderate milddanger",
-                                }
-                                Button {
-                                    text: "Return to Queue",
-                                    onclick: move |event: Event<MouseData>| {
-                                        event.stop_propagation(); // just the button, no deeper
-                                        let eventid = e.id;
-                                        spawn(async move {
-                                            if let Err(e) = crate::nip86::clear_event(context.config.read().relay_url.as_str(), eventid).await {
-                                                context.errors.write().push(format!("{e}"));
-                                            }
-                                            reload_trick += 1;
-                                        });
-                                    },
-                                    class: "moderate milddanger",
+                                div {
+                                    Button {
+                                        text: "Allow",
+                                        onclick: move |event: Event<MouseData>| {
+                                            event.stop_propagation(); // just the button, no deeper
+                                            let eventid = e.id;
+                                            spawn(async move {
+                                                if let Err(e) = crate::nip86::allow_event(context.config.read().relay_url.as_str(), eventid).await {
+                                                    context.errors.write().push(format!("{e}"));
+                                                }
+                                                reload_trick += 1;
+                                            });
+                                        },
+                                        class: "moderate milddanger",
+                                    }
+                                    Button {
+                                        text: "Return to Queue",
+                                        onclick: move |event: Event<MouseData>| {
+                                            event.stop_propagation(); // just the button, no deeper
+                                            let eventid = e.id;
+                                            spawn(async move {
+                                                if let Err(e) = crate::nip86::clear_event(context.config.read().relay_url.as_str(), eventid).await {
+                                                    context.errors.write().push(format!("{e}"));
+                                                }
+                                                reload_trick += 1;
+                                            });
+                                        },
+                                        class: "moderate milddanger",
+                                    }
                                 }
                             }
                             div { "end." }
@@ -187,33 +189,35 @@ pub fn Marked() -> Element {
                                     e: e.clone(),
                                     relay_url: context.config.read().relay_url.clone(),
                                 }
-                                Button {
-                                    text: "Ban",
-                                    onclick: move |event: Event<MouseData>| {
-                                        event.stop_propagation(); // just the button, no deeper
-                                        let eventid = e.id;
-                                        spawn(async move {
-                                            if let Err(e) = crate::nip86::ban_event(context.config.read().relay_url.as_str(), eventid).await {
-                                                context.errors.write().push(format!("{e}"));
-                                            }
-                                            reload_trick += 1;
-                                        });
-                                    },
-                                    class: "moderate milddanger",
-                                }
-                                Button {
-                                    text: "Return to Queue",
-                                    onclick: move |event: Event<MouseData>| {
-                                        event.stop_propagation(); // just the button, no deeper
-                                        let eventid = e.id;
-                                        spawn(async move {
-                                            if let Err(e) = crate::nip86::clear_event(context.config.read().relay_url.as_str(), eventid).await {
-                                                context.errors.write().push(format!("{e}"));
-                                            }
-                                            reload_trick += 1;
-                                        });
-                                    },
-                                    class: "moderate milddanger",
+                                div {
+                                    Button {
+                                        text: "Ban",
+                                        onclick: move |event: Event<MouseData>| {
+                                            event.stop_propagation(); // just the button, no deeper
+                                            let eventid = e.id;
+                                            spawn(async move {
+                                                if let Err(e) = crate::nip86::ban_event(context.config.read().relay_url.as_str(), eventid).await {
+                                                    context.errors.write().push(format!("{e}"));
+                                                }
+                                                reload_trick += 1;
+                                            });
+                                        },
+                                        class: "moderate milddanger",
+                                    }
+                                    Button {
+                                        text: "Return to Queue",
+                                        onclick: move |event: Event<MouseData>| {
+                                            event.stop_propagation(); // just the button, no deeper
+                                            let eventid = e.id;
+                                            spawn(async move {
+                                                if let Err(e) = crate::nip86::clear_event(context.config.read().relay_url.as_str(), eventid).await {
+                                                    context.errors.write().push(format!("{e}"));
+                                                }
+                                                reload_trick += 1;
+                                            });
+                                        },
+                                        class: "moderate milddanger",
+                                    }
                                 }
                             }
                             div { "end." }
@@ -232,19 +236,23 @@ pub fn Marked() -> Element {
                     match &*pubkeys.read_unchecked() {
                         Some(Ok(v)) => rsx! {
                             for pk in v.iter().cloned() {
-                                div { "{pk}" }
-                                Button {
-                                    text: "Clear ban",
-                                    onclick: move |event: Event<MouseData>| {
-                                        event.stop_propagation(); // just the button, no deeper
-                                        spawn(async move {
-                                            if let Err(e) = crate::nip86::clear_pubkey(context.config.read().relay_url.as_str(), pk).await {
-                                                context.errors.write().push(format!("{e}"));
-                                            }
-                                            reload_trick += 1;
-                                        });
-                                    },
-                                    class: "moderate milddanger",
+                                UserLine {
+                                    pk: pk
+                                }
+                                div {
+                                    Button {
+                                        text: "Clear ban",
+                                        onclick: move |event: Event<MouseData>| {
+                                            event.stop_propagation(); // just the button, no deeper
+                                            spawn(async move {
+                                                if let Err(e) = crate::nip86::clear_pubkey(context.config.read().relay_url.as_str(), pk).await {
+                                                    context.errors.write().push(format!("{e}"));
+                                                }
+                                                reload_trick += 1;
+                                            });
+                                        },
+                                        class: "moderate milddanger",
+                                    }
                                 }
                             }
                             div { "end." }
@@ -263,19 +271,23 @@ pub fn Marked() -> Element {
                     match &*pubkeys.read_unchecked() {
                         Some(Ok(v)) => rsx! {
                             for pk in v.iter().cloned() {
-                                div { "{pk}" }
-                                Button {
-                                    text: "Clear allowance",
-                                    onclick: move |event: Event<MouseData>| {
-                                        event.stop_propagation(); // just the button, no deeper
-                                        spawn(async move {
-                                            if let Err(e) = crate::nip86::clear_pubkey(context.config.read().relay_url.as_str(), pk).await {
-                                                context.errors.write().push(format!("{e}"));
-                                            }
-                                            reload_trick += 1;
-                                        });
-                                    },
-                                    class: "moderate milddanger",
+                                UserLine {
+                                    pk: pk
+                                }
+                                div {
+                                    Button {
+                                        text: "Clear allowance",
+                                        onclick: move |event: Event<MouseData>| {
+                                            event.stop_propagation(); // just the button, no deeper
+                                            spawn(async move {
+                                                if let Err(e) = crate::nip86::clear_pubkey(context.config.read().relay_url.as_str(), pk).await {
+                                                    context.errors.write().push(format!("{e}"));
+                                                }
+                                                reload_trick += 1;
+                                            });
+                                        },
+                                        class: "moderate milddanger",
+                                    }
                                 }
                             }
                             div { "end." }
