@@ -10,6 +10,16 @@ use nostr_sdk::Client as NostrClient;
 use serde_json::Value;
 use std::time::Duration;
 
+lazy_static! {
+    static ref METADATA: DashMap<PublicKey, Option<Metadata>> = {
+        DashMap::new()
+    };
+
+    static ref CLIENTS: DashMap<String, NostrClient> = {
+        DashMap::new()
+    };
+}
+
 pub fn id_list_to_filter(arr: Vec<Value>) -> Filter {
     let mut filter: Filter = Default::default();
     for elem in arr.iter() {
@@ -67,17 +77,6 @@ pub async fn get_events(
 
     Ok(events)
 }
-
-lazy_static! {
-    static ref METADATA: DashMap<PublicKey, Option<Metadata>> = {
-        DashMap::new()
-    };
-
-    static ref CLIENTS: DashMap<String, NostrClient> = {
-        DashMap::new()
-    };
-}
-
 
 pub async fn get_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     Result<Option<Metadata>, Box<dyn std::error::Error>>
