@@ -52,7 +52,13 @@ pub fn pubkey_list_to_vec(arr: Vec<Value>) -> Vec<PublicKey> {
     output
 }
 
-pub async fn get_events(
+pub async fn get_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
+    Result<Option<Metadata>, Box<dyn std::error::Error>>
+{
+    fetch_metadata(pubkey, discovery_relay_url).await
+}
+
+pub async fn fetch_events(
     url: &str,
     filter: Filter,
 ) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
@@ -78,7 +84,7 @@ pub async fn get_events(
     Ok(events)
 }
 
-pub async fn get_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
+pub async fn fetch_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     Result<Option<Metadata>, Box<dyn std::error::Error>>
 {
     if let Some(optmd) = METADATA.get(&pubkey) {
@@ -88,7 +94,7 @@ pub async fn get_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     let filter: Filter = Filter::default()
         .author(pubkey)
         .kind(Kind::RelayList);
-    let events = get_events(&*discovery_relay_url, filter).await?;
+    let events = fetch_events(&*discovery_relay_url, filter).await?;
     if events.is_empty() {
         METADATA.insert(pubkey, None);
         return Ok(None);
@@ -115,7 +121,7 @@ pub async fn get_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     let filter: Filter = Filter::default()
         .author(pubkey)
         .kind(Kind::Metadata);
-    let events = get_events(&*relays[0], filter).await?;
+    let events = fetch_events(&*relays[0], filter).await?;
     if events.is_empty() {
         METADATA.insert(pubkey, None);
         return Ok(None);

@@ -156,7 +156,7 @@ pub async fn mod_queue(
     };
 
     let filter = crate::nostr::id_list_to_filter(arr);
-    crate::nostr::get_events(url, filter).await
+    crate::nostr::fetch_events(url, filter).await
 }
 
 pub async fn allow_event(url: &str, id: EventId) -> Result<(), Box<dyn std::error::Error>> {
@@ -230,7 +230,7 @@ pub async fn listallowedevents(
     info!("Loaded {} allowed event IDs", arr.len());
 
     let filter = crate::nostr::id_list_to_filter(arr);
-    let events = crate::nostr::get_events(url, filter).await?;
+    let events = crate::nostr::fetch_events(url, filter).await?;
 
     info!("Loaded {} allowed events", events.len());
 
