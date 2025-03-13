@@ -94,7 +94,7 @@ pub async fn fetch_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     let filter: Filter = Filter::default()
         .author(pubkey)
         .kind(Kind::RelayList);
-    let events = fetch_events(&*discovery_relay_url, filter).await?;
+    let events = fetch_events(&discovery_relay_url, filter).await?;
     if events.is_empty() {
         METADATA.insert(pubkey, None);
         return Ok(None);
@@ -104,9 +104,9 @@ pub async fn fetch_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     let mut relays: Vec<String> = vec![];
     for tag in events[0].tags.iter().cloned() {
         let fields = tag.to_vec();
-        if fields.get(0) == Some(&"r".to_string()) {
+        if fields.first() == Some(&"r".to_string()) {
             if let Some(url) = fields.get(1) {
-                if fields.get(2) == None || fields.get(2) == Some(&"read".to_owned()) {
+                if fields.get(2).is_none() || fields.get(2) == Some(&"read".to_owned()) {
                     relays.push(url.to_owned());
                 }
             }
@@ -121,7 +121,7 @@ pub async fn fetch_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     let filter: Filter = Filter::default()
         .author(pubkey)
         .kind(Kind::Metadata);
-    let events = fetch_events(&*relays[0], filter).await?;
+    let events = fetch_events(&relays[0], filter).await?;
     if events.is_empty() {
         METADATA.insert(pubkey, None);
         return Ok(None);

@@ -55,7 +55,7 @@ fn main() {
 #[component]
 fn App() -> Element {
     let config =
-        use_synced_storage::<LocalStorage, Config>("config".to_string(), || Default::default());
+        use_synced_storage::<LocalStorage, Config>("config".to_string(), Default::default);
 
     let _context = use_context_provider(|| Context {
         config,

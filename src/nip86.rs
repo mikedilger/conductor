@@ -128,12 +128,10 @@ pub async fn stats(url: &str) -> Result<Map<String, Value>, Box<dyn std::error::
 
     if let Some(err) = response.error {
         Err(Box::new(std::io::Error::other(err)))
+    } else if let Value::Object(m) = response.result {
+        Ok(m)
     } else {
-        if let Value::Object(m) = response.result {
-            Ok(m)
-        } else {
-            err("Result was not an object.")
-        }
+        err("Result was not an object.")
     }
 }
 
