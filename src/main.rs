@@ -1,4 +1,5 @@
 mod components;
+mod fetch_job;
 mod nip86;
 mod nostr;
 mod views;
