@@ -21,7 +21,7 @@ pub fn Marked() -> Element {
     let events = use_resource(move || async move {
         match tab() {
             Tab::BannedEvents => {
-                crate::nip86::listbannedevents(
+                crate::nip86::fetchbannedevents(
                     context.config.read().relay_url.as_str(),
                     reload_trick(),
                 )

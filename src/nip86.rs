@@ -235,11 +235,11 @@ pub async fn listallowedevents(
     Ok(events)
 }
 
-pub async fn listbannedevents(
+pub async fn fetchbannedevents(
     url: &str,
     _reload_trick: usize,
 ) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
-    let response = run_command_on_relay(url, "listbannedevents2", json!([])).await?;
+    let response = run_command_on_relay(url, "fetchbannedevents", json!([])).await?;
 
     let err = |s| -> Result<Vec<Event>, Box<dyn std::error::Error>> {
         Err(Box::new(std::io::Error::other(s)))
