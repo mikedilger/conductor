@@ -25,17 +25,19 @@ lazy_static! {
 pub async fn get_metadata(pubkey: PublicKey, discovery_relay_url: String) ->
     Result<Option<Metadata>, Box<dyn std::error::Error>>
 {
+    {
+        match METADATA.get(&pubkey) {
+            Some(fj) => return Ok(fj.get().await),
+            None => { }
+        }
+    }
+
+    let fj = FetchJob::new();
+    METADATA.insert(pubkey, fj.clone());
+    fetch_metadata(pubkey, discovery_relay_url, fj).await?;
     match METADATA.get(&pubkey) {
         Some(fj) => Ok(fj.get().await),
-        None => {
-            let fj = FetchJob::new();
-            METADATA.insert(pubkey, fj.clone());
-            fetch_metadata(pubkey, discovery_relay_url, fj).await?;
-            match METADATA.get(&pubkey) {
-                Some(fj) => Ok(fj.get().await),
-                None => panic!("Impossible"),
-            }
-        }
+        None => panic!("Impossible"),
     }
 }
 

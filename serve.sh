@@ -1,3 +1,3 @@
 #!/bin/bash
 
-dx serve --hot-reload true
+dx serve --cross-origin-policy --hot-reload true

@@ -656,6 +656,7 @@ dependencies = [
  "lazy_static",
  "nostr",
  "nostr-sdk",
+ "parking_lot",
  "reqwest",
  "secp256k1 0.28.2",
  "serde",
